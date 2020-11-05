@@ -1,6 +1,6 @@
 package exercises
 
-abstract class MyList {
+abstract class MyList[+A] {
 
   /*
       head = first element of list
@@ -10,9 +10,9 @@ abstract class MyList {
       tostring = a string representation of the list
    */
 
-  def head: Int
-  def tail: MyList
-  def add(el: Int): MyList
+  def head: A
+  def tail: MyList[A]
+  def add[B >: A](el: B): MyList[B]
   def isEmpty: Boolean
 
   def printElements: String
@@ -21,22 +21,22 @@ abstract class MyList {
 }
 
 // objects can extend classes
-object Empty extends MyList {
+object Empty extends MyList[Nothing] {
 
-  def head: Int = throw new NoSuchElementException
-  def tail: MyList = throw new NoSuchElementException
-  def add(el: Int): MyList = new Cons(el, Empty)
+  def head: Nothing = throw new NoSuchElementException
+  def tail: MyList[Nothing] = throw new NoSuchElementException
+  def add[B >: Nothing](el: B): MyList[B] = new Cons(el, Empty)
   def isEmpty: Boolean = true
 
 
   def printElements: String = ""
 }
 
-class Cons(h: Int, t: MyList) extends MyList {
+class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
 
-  def head: Int = h
-  def tail: MyList = t
-  def add(el: Int): MyList = new Cons(el, this)
+  def head: A = h
+  def tail: MyList[A] = t
+  def add[B >: A](el: B): MyList[B] = new Cons(el, this)
   def isEmpty: Boolean = false
   def printElements: String =
     if (t.isEmpty) "" + h
@@ -44,10 +44,10 @@ class Cons(h: Int, t: MyList) extends MyList {
 }
 
 object ListTest extends App {
-  val list = new Cons(1, new Cons(2, new Cons(3, Empty)))
-  println(list.tail.head)
-  println(list.add(4).head)
-  println(list.isEmpty)
 
-  println(list.toString)
+  val listOfIntegers: MyList[Int] = new Cons(1, new Cons(2, new Cons(3, Empty)))
+  val listOfStrings: MyList[String] = new Cons("one", new Cons("two", new Cons("three", Empty)))
+
+  println(listOfIntegers.toString)
+  println(listOfStrings.toString)
 }
