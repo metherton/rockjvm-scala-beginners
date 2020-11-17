@@ -27,7 +27,7 @@ abstract class MyList[+A] {
 }
 
 // objects can extend classes
-object Empty extends MyList[Nothing] {
+case object Empty extends MyList[Nothing] {
 
   def head: Nothing = throw new NoSuchElementException
   def tail: MyList[Nothing] = throw new NoSuchElementException
@@ -43,7 +43,7 @@ object Empty extends MyList[Nothing] {
   def printElements: String = ""
 }
 
-class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
 
   def head: A = h
   def tail: MyList[A] = t
@@ -105,9 +105,10 @@ trait MyTransformer[-A, B] {
 
 object ListTest extends App {
 
-  val listOfIntegers: MyList[Int] = new Cons(1, new Cons(2, new Cons(3, Empty)))
-  val anotherListOfIntegers: MyList[Int] = new Cons(4, new Cons(5, Empty))
-  val listOfStrings: MyList[String] = new Cons("one", new Cons("two", new Cons("three", Empty)))
+  val listOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
+  val cloneListOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
+  val anotherListOfIntegers: MyList[Int] = Cons(4, Cons(5, Empty))
+  val listOfStrings: MyList[String] = Cons("one", Cons("two", Cons("three", Empty)))
 
   println(anotherListOfIntegers.toString)
   println(listOfStrings.toString)
@@ -122,7 +123,9 @@ object ListTest extends App {
   }))
 
   println(listOfIntegers.flatMap(new MyTransformer[Int, MyList[Int]] {
-    override def transform(elem: Int): MyList[Int] = new Cons(elem, new Cons(elem + 1, Empty))
+    override def transform(elem: Int): MyList[Int] = Cons(elem, Cons(elem + 1, Empty))
   }))
+
+  println(cloneListOfIntegers == listOfIntegers)
 
 }
