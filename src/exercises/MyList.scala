@@ -1,5 +1,7 @@
 package exercises
 
+import scala.annotation.tailrec
+
 abstract class MyList[+A] {
 
   /*
@@ -21,6 +23,11 @@ abstract class MyList[+A] {
   def flatMap[B](transformer: A => MyList[B]): MyList[B]
   def filter(test: A => Boolean): MyList[A]
 
+  // hofs
+  def foreach(f: A => Unit): Unit
+  def sort(compare: (A, A) => Int): MyList[A]
+  def zipWith[B,C](otherList: MyList[B], zip: (A, B) => C): MyList[C]
+  def fold[B](start: B)(operator: (B, A) => B): B
 
 
   def printElements: String
@@ -42,6 +49,16 @@ case object Empty extends MyList[Nothing] {
   def flatMap[B](transformer: Nothing => MyList[B]): MyList[B] = Empty
   def filter(test: Nothing => Boolean): MyList[Nothing] = Empty
 
+  // hofs
+  def foreach(f: Nothing => Unit): Unit = ()
+  def sort(compare: (Nothing, Nothing) => Int) = Empty
+  def zipWith[B,C](otherList: MyList[B], zip: (Nothing, B) => C): MyList[C] =
+    if (!otherList.isEmpty) throw new RuntimeException("Lists do not have the same length")
+    else Empty
+  def fold[B](start: B)(operator: (B, Nothing) => B) = start
+
+
+
   // concatenation
   def ++[B >: Nothing](list: MyList[B]): MyList[B] = list
 
@@ -57,6 +74,37 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
   def printElements: String =
     if (t.isEmpty) "" + h
     else h + " " + t.printElements
+
+  // hofs
+  def foreach(f: A => Unit): Unit = {
+    f(h)
+    tail.foreach(f)
+  }
+
+  def sort(compare: (A, A) => Int): MyList[A] = {
+
+    def insert(x: A, sortedList: MyList[A]): MyList[A] =
+      if (sortedList.isEmpty) new Cons(x, Empty)
+      else if (compare(x, sortedList.head) <= 0) new Cons(x, sortedList)
+      else new Cons(sortedList.head, insert(x, sortedList.tail))
+
+    val sortedTail = t.sort(compare)
+    insert(h, sortedTail)
+  }
+  def zipWith[B,C](list: MyList[B], zip: (A, B) => C): MyList[C] =
+    if (list.isEmpty) throw new RuntimeException("You do not have same length")
+    else new Cons(zip(head, list.head), tail.zipWith(list.tail, zip))
+
+  /*
+      [1,2,3].fold(0)(+) =
+        [2,3].fold(1)(+) =
+        [3].fold(3)(+) =
+        [].fold(6)(+) = 6
+
+   */
+  def fold[B](start: B)(operator: (B, A) => B) =
+    tail.fold(operator(start, head))(operator)
+
 
   /*
       [1, 2, 3].map(n * 2)
@@ -105,7 +153,7 @@ object ListTest extends App {
   val listOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
   val cloneListOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
   val anotherListOfIntegers: MyList[Int] = Cons(4, Cons(5, Empty))
-  val listOfStrings: MyList[String] = Cons("one", Cons("two", Cons("three", Empty)))
+  val listOfStrings: MyList[String] = Cons("one", Cons("two", Empty))
 
   println(anotherListOfIntegers.toString)
   println(listOfStrings.toString)
@@ -120,4 +168,19 @@ object ListTest extends App {
 
   println(cloneListOfIntegers == listOfIntegers)
 
+  listOfIntegers.foreach((x: Int) => println(s"Number: $x"))
+
+  println(Cons(4, Cons(5, Cons(3, Empty))).sort((x, y) => x - y))
+
+  println(anotherListOfIntegers.zipWith[String, String](listOfStrings, _ + "-" + _))
+
+  println(listOfIntegers.fold(0)(_ + _))
+
+  // for comprehensions
+  val combinations = for {
+    n <- listOfIntegers
+    string <- listOfStrings
+  } yield n + "-" + string
+
+  println(combinations)
 }
