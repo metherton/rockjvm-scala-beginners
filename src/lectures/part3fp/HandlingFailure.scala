@@ -94,4 +94,22 @@ object HandlingFailure extends App {
   } yield renderHTML(html)
 
 
+
+  /**
+    *
+    *    IMPERATIVE version
+    *
+    *    try {
+    *       connection = HttpService.getConnection(host, port)
+    *       try {
+    *         page = connection.get("/home")
+    *         renderHTML(page)
+    *       } catch (some other eception) {
+    *       }
+    *     } catch (exception) {
+    *     }
+    *
+    */
+
+
 }
