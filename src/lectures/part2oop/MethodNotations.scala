@@ -23,26 +23,26 @@ object MethodNotations extends App {
 
   val mary = new Person("Mary", "Inception", 25)
 
-  println(+mary)
-
-  println(mary.likes("Inception"))
-  println(mary likes "Inception") // equivalent
-  // infix notation = operator notation
-
-  println(mary.learns("scala"))
-
-  println(mary learnScala)
-
-  println(mary(5))
+//  println(+mary)
+//
+//  println(mary.likes("Inception"))
+//  println(mary likes "Inception") // equivalent
+//  // infix notation = operator notation
+//
+//  println(mary.learns("scala"))
+//
+//  println(mary learnScala)
+//
+//  println(mary(5))
 
   // "operators" in scala
   val tom = new Person("Tom", "Fight Club", 28)
-  println(mary + tom)
+//  println(mary + tom)
+//
+//  println((mary + "the bloody one")())
 
-  println((mary + "the bloody one")())
-
-  println(mary.+(tom))
-  println(!mary)
+//  println(mary.+(tom))
+//  println(!mary)
 
   println(mary.unary_!)
   // prefix notation
