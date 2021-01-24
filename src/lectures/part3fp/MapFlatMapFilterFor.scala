@@ -1,6 +1,6 @@
 package lectures.part3fp
 
-import exercises.{Cons, Empty, MyList}
+import exercises.{ConsList, Empty, MyList}
 
 
 object MapFlatMapFilterFor extends App {
@@ -64,7 +64,7 @@ object MapFlatMapFilterFor extends App {
 
    */
 
-  val listOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
+  val listOfIntegers: MyList[Int] = ConsList(1, ConsList(2, ConsList(3, Empty)))
   println(listOfIntegers)
 
   for {

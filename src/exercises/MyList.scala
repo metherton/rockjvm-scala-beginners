@@ -43,7 +43,7 @@ case object Empty extends MyList[Nothing] {
 
   def head: Nothing = throw new NoSuchElementException
   def tail: MyList[Nothing] = throw new NoSuchElementException
-  def add[B >: Nothing](el: B): MyList[B] = new Cons(el, Empty)
+  def add[B >: Nothing](el: B): MyList[B] = new ConsList(el, Empty)
   def isEmpty: Boolean = true
   def map[B](transformer: Nothing => B): MyList[B] = Empty
   def flatMap[B](transformer: Nothing => MyList[B]): MyList[B] = Empty
@@ -65,11 +65,11 @@ case object Empty extends MyList[Nothing] {
   def printElements: String = ""
 }
 
-case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
+case class ConsList[+A](h: A, t: MyList[A]) extends MyList[A] {
 
   def head: A = h
   def tail: MyList[A] = t
-  def add[B >: A](el: B): MyList[B] = new Cons(el, this)
+  def add[B >: A](el: B): MyList[B] = new ConsList(el, this)
   def isEmpty: Boolean = false
   def printElements: String =
     if (t.isEmpty) "" + h
@@ -84,16 +84,16 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
   def sort(compare: (A, A) => Int): MyList[A] = {
 
     def insert(x: A, sortedList: MyList[A]): MyList[A] =
-      if (sortedList.isEmpty) new Cons(x, Empty)
-      else if (compare(x, sortedList.head) <= 0) new Cons(x, sortedList)
-      else new Cons(sortedList.head, insert(x, sortedList.tail))
+      if (sortedList.isEmpty) new ConsList(x, Empty)
+      else if (compare(x, sortedList.head) <= 0) new ConsList(x, sortedList)
+      else new ConsList(sortedList.head, insert(x, sortedList.tail))
 
     val sortedTail = t.sort(compare)
     insert(h, sortedTail)
   }
   def zipWith[B,C](list: MyList[B], zip: (A, B) => C): MyList[C] =
     if (list.isEmpty) throw new RuntimeException("You do not have same length")
-    else new Cons(zip(head, list.head), tail.zipWith(list.tail, zip))
+    else new ConsList(zip(head, list.head), tail.zipWith(list.tail, zip))
 
   /*
       [1,2,3].fold(0)(+) =
@@ -114,7 +114,7 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
         = new Cons(2, new Cons(4, new Cons(6, Empty))))
    */
   def map[B](transformer: A => B): MyList[B] =
-    new Cons(transformer(h), t.map(transformer))
+    new ConsList(transformer(h), t.map(transformer))
   /*
       [1, 2].flatMap(n => [n, n +1]
       = [1, 2] ++ [2].flatMap(n => [n, n + 1])
@@ -133,7 +133,7 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
       = new Cons(1, new Cons(2, Empty ++ [3, 4, 5])))
       = new Cons(1, new Cons(2, new Cons(3, new Cons(4, new Cons(5)])))
    */
-  def ++[B >: A](list: MyList[B]): MyList[B] = new Cons(h, t ++ list)
+  def ++[B >: A](list: MyList[B]): MyList[B] = new ConsList(h, t ++ list)
   /*
       [1, 2, 3].filter(n % 2 == 0) =
         [2, 3].filter(n % 2 == 0) =
@@ -142,7 +142,7 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
         = new Cons(2, Empty)
    */
   def filter(predicate: A => Boolean): MyList[A] =
-    if (predicate(h)) new Cons(h, t.filter(predicate))
+    if (predicate(h)) new ConsList(h, t.filter(predicate))
     else t.filter(predicate)
 
 }
@@ -150,10 +150,10 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
 
 object ListTest extends App {
 
-  val listOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
-  val cloneListOfIntegers: MyList[Int] = Cons(1, Cons(2, Cons(3, Empty)))
-  val anotherListOfIntegers: MyList[Int] = Cons(4, Cons(5, Empty))
-  val listOfStrings: MyList[String] = Cons("one", Cons("two", Empty))
+  val listOfIntegers: MyList[Int] = ConsList(1, ConsList(2, ConsList(3, Empty)))
+  val cloneListOfIntegers: MyList[Int] = ConsList(1, ConsList(2, ConsList(3, Empty)))
+  val anotherListOfIntegers: MyList[Int] = ConsList(4, ConsList(5, Empty))
+  val listOfStrings: MyList[String] = ConsList("one", ConsList("two", Empty))
 
   println(anotherListOfIntegers.toString)
   println(listOfStrings.toString)
@@ -164,13 +164,13 @@ object ListTest extends App {
 
   println(anotherListOfIntegers.filter(_ % 2 == 0))
 
-  println(listOfIntegers.flatMap((elem: Int) => Cons(elem, Cons(elem + 1, Empty))))
+  println(listOfIntegers.flatMap((elem: Int) => ConsList(elem, ConsList(elem + 1, Empty))))
 
   println(cloneListOfIntegers == listOfIntegers)
 
   listOfIntegers.foreach((x: Int) => println(s"Number: $x"))
 
-  println(Cons(4, Cons(5, Cons(3, Empty))).sort((x, y) => x - y))
+  println(ConsList(4, ConsList(5, ConsList(3, Empty))).sort((x, y) => x - y))
 
   println(anotherListOfIntegers.zipWith[String, String](listOfStrings, _ + "-" + _))
 

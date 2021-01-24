@@ -1,6 +1,6 @@
 package lectures.part4patternmatching
 
-import exercises.{Cons, Empty, MyList}
+import exercises.{ConsList, Empty, MyList}
 
 
 object AllThePatterns extends App {
@@ -41,10 +41,10 @@ object AllThePatterns extends App {
 
   // 4 - case classes - constructor pattern
   // PMs can be nested with CCs as well
-  val aList: MyList[Int] = Cons(1, Cons(2, Empty))
+  val aList: MyList[Int] = ConsList(1, ConsList(2, Empty))
   val matchAList = aList match {
     case Empty =>
-    case Cons(head, Cons(subhead, subtail)) =>
+    case ConsList(head, ConsList(subhead, subtail)) =>
   }
 
   // 5 - List patterns
@@ -65,19 +65,19 @@ object AllThePatterns extends App {
 
   // 7 name binding
   val nameBindingMatch = aList match {
-    case nonEmptyList @ Cons(_,_) => //name binding => use the name later (here)
-    case Cons(1, rest @ Cons(2, _)) => // name binding inside nested patterns
+    case nonEmptyList @ ConsList(_,_) => //name binding => use the name later (here)
+    case ConsList(1, rest @ ConsList(2, _)) => // name binding inside nested patterns
   }
 
   // 8 - multi patterns
   val multiPattern = aList match {
-    case Empty | Cons(0,_) => // compound (multi pattern)
+    case Empty | ConsList(0,_) => // compound (multi pattern)
     case _ => ""
   }
 
   // 9 - if guards
   val secondElementSpecial = aList match {
-    case Cons(_, Cons(specialElement, _)) if specialElement % 2 == 0 =>
+    case ConsList(_, ConsList(specialElement, _)) if specialElement % 2 == 0 =>
   }
 
 
