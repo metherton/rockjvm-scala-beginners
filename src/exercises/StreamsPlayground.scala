@@ -122,5 +122,44 @@ object StreamsPlayground extends App {
   println(startFrom0.flatMap(x => new Cons(x, new Cons(x + 1, EmptyStream))).take(10).toList())
 
   println(startFrom0.filter(_ < 10).take(10).toList())
+
+  // Exercises on streams
+  // 1 stream of fibonacci numbers
+  // 2 stream of prime numbers with eratosthenes sieve
+  /*
+      [2 3 4 ...]
+      filter out all numbers divisible by 2
+      [2 3 5 7 9 11 ...]
+      filter out all numbers divisible by 3
+      [2 3 5 7 11 ...]
+      filter out all numbers divisible by 5
+        ...
+   */
+
+  /*
+      [first, [... ]
+      [first, fibo(second, first + second)
+
+   */
+  def fibonnaci(first: Int, second: Int): MyStream[Int] =
+    new Cons(first, fibonnaci(second, first + second))
+
+  println(fibonnaci(1, 1).take(100).toList())
+
+
+  /*
+        [2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ...
+        [2, 3, 5, 7, 9, 11...
+        [ 2 erathusthenus applied to numbers filtered by n % 2 != 0
+        [ 2 3 erathusthens applied to 5, 7, 9 filtered by n % 3 !=0
+        [2 3 5 erathusthenus applied to 7 11
+
+   */
+  def eratusthenus(numbers: MyStream[Int]): MyStream[Int] =
+    if (numbers.isEmpty) numbers
+    else new Cons(numbers.head, eratusthenus(numbers.tail).filter(_ % numbers.head != 0))
+
+
+  println(eratusthenus(MyStream.from(2)(_ + 1)).take(100).toList())
 }
 
