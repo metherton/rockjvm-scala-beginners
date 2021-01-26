@@ -107,6 +107,39 @@ object MyStream {
 
 
 object StreamsPlayground extends App {
+
+  val f1 = (x: Int) => List(x * 2)
+  val fs = (x: Int) => Some(x * 2)
+
+  val s1 = Some(2)
+  println(s1.flatMap(fs))
+  println(fs(2))
+
+
+
+  println(f1(2) ++ Nil.flatMap(f1))
+
+  val aList = List(2)
+
+  println(f1(2) == aList.flatMap(f1))
+  println(aList.flatMap(f1))
+  println(f1(2))
+
+  val f2 = (x: List[Int]) => List(x.map(y => y * 2))
+
+  val aList2 = List(List(1, 2, 3))
+
+  println(f2(List(1, 2, 3)) == aList2.flatMap(f2))
+
+  val aMonadInstance = List(4,5,6)
+  println(aMonadInstance.flatMap(x => List.apply(x)) == aMonadInstance)
+
+  val fg = (x: Int) => List(x * 3)
+  val fh = (x: Int) => List(x * 4)
+
+  println(aMonadInstance.flatMap(fg).flatMap(fh))
+  println(aMonadInstance.flatMap(x => fg(x).flatMap(fh)))
+
   val naturals = MyStream.from(1)(_ + 1)
   println(naturals.head)
   println(naturals.tail.head)
@@ -115,7 +148,7 @@ object StreamsPlayground extends App {
   val startFrom0 = 0 #:: naturals // naturals.::#(0)
   println(startFrom0.head)
 
-  startFrom0.take(10000).foreach(println)
+ // startFrom0.take(10000).foreach(println)
 
   // map , flatMap
   println(startFrom0.map(_ * 2).take(100).toList())
