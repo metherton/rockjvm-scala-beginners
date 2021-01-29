@@ -44,6 +44,8 @@ object Expressions extends App {
     if (z > 2) "Hello" else "Goodbye"
   }
 
-
+  println(s"${(640 * 0.01).toInt}")
+  println(s"${(480 * 0.75).toInt}")
+  println(s"${(480 * 0.22).toInt}")
 
 }
