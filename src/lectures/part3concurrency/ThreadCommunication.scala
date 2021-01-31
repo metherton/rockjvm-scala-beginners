@@ -220,5 +220,94 @@ object ThreadCommunication extends App {
   }
 
 
-  multiProdCons(3,3)
+  //multiProdCons(3,3)
+
+
+  /*
+      Exerviss
+
+      1. Think of an example where notifyAll acts in a diffferent way than notify ?
+      2. create a deadlock
+      3. create a livelock
+
+   */
+
+    // notifyAll
+
+    def testNotifyAll(): Unit = {
+      val bell = new Object()
+      (1 to 10).foreach(i => new Thread(() => {
+        bell.synchronized{
+          println(s"[thread $i] waiting ...")
+          bell.wait()
+          println(s"[thread $i] hooray ...")
+        }
+      }).start())
+
+      new Thread(() => {
+
+        Thread.sleep(2000)
+        println("rock and roll")
+        bell.synchronized{
+          bell.notifyAll()
+        }
+
+      }).start()
+    }
+
+  //  testNotifyAll()
+
+  // 2 Deadlock
+
+  case class Friend(name: String) {
+    def bow(other: Friend): Unit = {
+      this.synchronized {
+        println(s"$this: I am bowing to my friend $other")
+        other.rise(this)
+        println(s"$this: my friend $other has risen")
+      }
+    }
+
+    def rise(other: Friend): Unit = {
+      this.synchronized {
+        println(s"$this: I am rising to my friend $other")
+      }
+    }
+
+    var side = "right"
+    def switchSide() = {
+      if (side == "right") side = "left"
+      else side = "right"
+    }
+
+    def pass(other: Friend) = {
+      while(this.side == other.side) {
+        println(s"$this: Oh, but please, $other, feel free to pass...")
+        switchSide()
+        Thread.sleep(1000)
+      }
+    }
+
+  }
+
+  val sam = Friend("sam")
+  val pierre = Friend("pierre")
+
+//  new Thread(() => {  // sams lock  | then pierres lock
+//    sam.bow(pierre)
+//  }).start()
+//  new Thread(() => {   // pierres lock  | then sams lock
+//    pierre.bow(sam)
+//  }).start()
+
+
+  // 3 livelock
+
+  new Thread(() => {
+    sam.pass(pierre)
+  }).start()
+  new Thread(() => {
+    pierre.pass(sam)
+  }).start()
+
 }
