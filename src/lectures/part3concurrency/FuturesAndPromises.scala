@@ -1,13 +1,74 @@
 package lectures.part3concurrency
 
 import scala.concurrent.{Await, Future, Promise}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Random, Success, Try}
 import scala.concurrent.duration._
 
 // important for futures
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object FuturesAndPromises extends App {
+
+  val excludedSourcesInConfig = List("")
+  if (excludedSourcesInConfig(0) == "") {
+    println("empty list")
+  }
+
+  val excludedVideoSourcesMain = if (excludedSourcesInConfig(0) != "" && excludedSourcesInConfig.contains("screen")) excludedSourcesInConfig else List()
+  val excludedVideoSourcesRow = if (excludedSourcesInConfig(0) != "") "screen" :: excludedSourcesInConfig else List("screen")
+
+  println(excludedVideoSourcesMain)
+  println(excludedVideoSourcesRow)
+
+
+  val width = "1024".toDouble
+  val height = "576".toDouble
+  val prop: Double = height / width
+  println(prop)
+  println(576/1024)
+  val numcol = 5
+  val rowh = ((height / width) * (width / numcol)).toInt
+  println(rowh)
+  val screenHeight = (height - rowh).toInt
+  println(screenHeight)
+  val screenWidth = ((screenHeight / height) * width).toInt
+  println(screenWidth)
+
+  val videoLayout: String =
+    f"""
+      |{
+      |    "main": {
+      |       "xpos: ${((width - screenWidth)/2).toInt}
+      |       "row": 1,
+      |       "column": 2,
+      |       "y_pos": ${screenHeight}
+      |       "width": ${width.toInt}
+      |    }
+      |}
+    """.stripMargin
+
+  val videoLayoutConc1: String =
+    f"""
+       |{
+       |    "main": {
+       |       "row": 1,
+     """
+
+  val videoSources: String = if (excludedVideoSourcesMain.length > 0)
+    f"""|       "video": screen,
+     """
+  else ""
+
+  val videoLayoutConc2: String =
+    f"""|       "column": 2,
+       |    }
+       |}
+    """
+
+  val combined = if (true) videoLayoutConc1 + videoSources + videoLayoutConc2 else videoLayoutConc1  + videoLayoutConc2
+
+  println(videoLayout)
+  println(combined.stripMargin)
 
   def calculateMeaningOfLife: Int = {
     Thread.sleep(2000)
@@ -161,4 +222,87 @@ object FuturesAndPromises extends App {
 
   Thread.sleep(1000)
 
+  /*
+      1. fulfill a future immediately with a value
+      2. write function inSequence(fa, fb) // 2 futures in sequence
+      3. function first(fa, fb) -> future with the first value of the two futures
+      4. function last(fa, fb) -> future with the last value of the two futures
+      5. retryUntil[T](action: () => Future[T], condition: T => Boolean): Future[T]
+
+   */
+
+  // 1
+  def fulfillImmediately[T](value: T): Future[T] = Future(value)
+
+  // 2
+  def insequence[A, B](first: Future[A], second: Future[B]): Future[B] =
+    first.flatMap(_ => second)
+
+  // 3 - first out of two futures
+  def first[A](fa: Future[A], fb: Future[A]): Future[A] = {
+
+    val promise = Promise[A]()
+
+    fa.onComplete(promise.tryComplete)
+    fb.onComplete(promise.tryComplete)
+
+    promise.future
+
+  }
+
+  // 4 - last out of two futures
+  def last[A](fa: Future[A], fb: Future[A]): Future[A] = {
+
+    // 1 promise which both will try to complete
+    // 2 promise which the LAST future will complete
+    val bothPromise = Promise[A]()
+    val lastPromise = Promise[A]()
+    val checkAndComplete = (result: Try[A]) =>
+      if (!bothPromise.tryComplete(result))
+        lastPromise.complete(result)
+
+    fa.onComplete(checkAndComplete)
+    fb.onComplete(checkAndComplete)
+
+    lastPromise.future
+
+  }
+
+  val fast = Future {
+    Thread.sleep(100)
+    42
+  }
+
+  val slow = Future {
+    Thread.sleep(200)
+    45
+  }
+
+  first(fast, slow).foreach(f => println("FIRST: " + f))
+  last(fast, slow).foreach(l => println("LAST: " + l))
+
+  Thread.sleep(1000)
+
+  // retry until
+
+  def retryUntil[A](action: () => Future[A], condition: A => Boolean): Future[A] =
+    action()
+      .filter(condition)
+      .recoverWith {
+        case _ => retryUntil(action, condition)
+      }
+
+  val random = new Random()
+  val action = () => Future {
+    Thread.sleep(100)
+    val nextValue = random.nextInt(100)
+    println("generated: " + nextValue)
+    nextValue
+  }
+
+  retryUntil(action, (x: Int) => x < 5).foreach(result => println("result is " + result))
+
+  Thread.sleep(2000)
 }
+
+
