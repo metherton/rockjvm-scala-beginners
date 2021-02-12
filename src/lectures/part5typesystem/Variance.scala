@@ -1,5 +1,7 @@
 package lectures.part5typesystem
 
+import lectures.part5typesystem.Variance.InvariantParking
+
 object Variance extends App {
 
   trait Animal
@@ -7,10 +9,15 @@ object Variance extends App {
   class Cat extends Animal
   class Crocodile extends Animal
 
+  case class House[A >: Animal](animal: A)
+  House(new Dog)
+
   // what is variance
   // "inheritance" type substitution of generics
 
   class Cage[T]
+  val animalCage: Cage[Animal] = new Cage[Animal]
+
   // yes - covariance
   class CCage[+T]
   val ccage: CCage[Animal] = new CCage[Cat]
@@ -111,5 +118,87 @@ object Variance extends App {
       return types are in COVARIANT position
 
    */
+
+  /*
+
+      1. Design Invariant, Covariant, Contravariant versions
+
+          Parking[T](things: List[T] {
+
+            park(vehicle: T)
+            impound(vehicles: List[T])
+            checkVehicles(conditions: String): List[T]
+          }
+
+      2. Used someone elses API: IList[T]
+
+      3. Parking = monad!
+          - flatMap
+
+   */
+
+  class Vehicle
+  class Bike extends Vehicle
+  class Car extends Vehicle
+
+  class IList[T]
+
+  class InvariantParking[T](vehicles: List[T]) {
+    def park(vehicle: T): InvariantParking[T] = ???
+    def impound(vehicles: List[T]): InvariantParking[T] = ???
+    def checkVehicles(conditions: String): List[T] = vehicles
+
+    def flatMap[S](f: T => InvariantParking[S]): InvariantParking[S] = ???
+  }
+
+  val vip = new InvariantParking[Vehicle](List[Vehicle]())
+  vip.park(new Vehicle)
+
+  class CovariantParking[+T](vehicles: List[T]) {
+    def park[S >: T](vehicle: S): CovariantParking[S] = ???
+    def impound[S >: T](vehicles: List[S]): CovariantParking[S] = ???
+    def checkVehicles(conditions: String): List[T] = ???
+
+    def flatMap[S](f: T => CovariantParking[S]): CovariantParking[S] = ???
+  }
+
+
+  class ContravariantParking[-T](vehicles: List[T]) {
+    def park(vehicle: T): ContravariantParking[T] = ???
+    def impound(vehicles: List[T]): ContravariantParking[T] = ???
+    def checkVehicles[S <: T](conditions: String): List[S]  = ???
+
+    // check the Variance exercise video for explanation about this..basically double contravariance = covariance
+    def flatMap[R <: T, S](f: R => ContravariantParking[S]): ContravariantParking[S] = ???
+  }
+
+  /*
+      Rule of Thumb
+      - use covariance = COLLECTION OF THINGS
+      - use contravariance = GROUP OF ACTIONS
+
+
+   */
+
+  // Exercise 2
+
+  class CovariantParking2[+T](vehicles: IList[T]) {
+    def park[S >: T](vehicle: S): CovariantParking2[S] = ???
+    def impound[S >: T](vehicles: IList[S]): CovariantParking2[S] = ???
+    def checkVehicles[S >: T](conditions: String): IList[S] = ???
+  }
+
+
+  class ContravariantParking2[-T](vehicles: IList[T]) {
+    def park(vehicle: T): ContravariantParking2[T] = ???
+    def impound[S <: T](vehicles: IList[S]): ContravariantParking2[S] = ???
+    def checkVehicles[S <: T](conditions: String): IList[S]  = ???
+  }
+
+  // Exercise 3
+
+  // flatMap
+
+
 
 }
