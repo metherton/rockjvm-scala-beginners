@@ -5,6 +5,12 @@ import scala.annotation.tailrec
 object TuplesAndMaps extends App {
 
 
+  val myM = scala.collection.mutable.Map(("one" -> ("oneP", "oneS")), ("two" -> ("twoP", "twoS")))
+  myM += ("three" -> ("threeP", "threeS"))
+  println(myM)
+  myM -= "one"
+  println(myM)
+
   // tuples = finite ordered lists
   val aTuple = new Tuple2(2, "hello scala") // Tuple2[Int, String] = (Int, String)
 

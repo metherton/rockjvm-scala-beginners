@@ -42,7 +42,13 @@ object WhatsAFunction extends App {
     override def apply(a: String, b: String): String = a concat b
   }
 
+
+//  class MyConcatenator extends Function2[String, String, String] {
+//    override def apply(v1: String, v2: String): String = v1 concat v2
+//  }
+
   println(concatenator("hello ", "world"))
+//  println(new MyConcatenator("foo", "bar"))
 
   // Function1[Int, Function1[Int, Int]]
   val superAdderq: Function1[Int, Function1[Int, Int]] = new Function1[Int, Function1[Int, Int]] {

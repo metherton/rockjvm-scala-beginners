@@ -5,6 +5,9 @@ object Expressions extends App {
   val x = 1 + 2 // EXPRESSION
   println(x)
 
+  val cookieString = "username=user"
+  println((cookieString.split("="))(1))
+
 
   println(2 + 3 * 4)
 

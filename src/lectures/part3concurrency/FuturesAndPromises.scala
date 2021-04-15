@@ -9,66 +9,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object FuturesAndPromises extends App {
 
-  val excludedSourcesInConfig = List("")
-  if (excludedSourcesInConfig(0) == "") {
-    println("empty list")
+
+  case class Person(name: String, age: Int)
+
+  val youngGuy = Person("youngie", 20)
+  val oldGuy = Person("oldie", 50)
+
+  val futureGuys = Future {
+    List(youngGuy, oldGuy)
   }
 
-  val excludedVideoSourcesMain = if (excludedSourcesInConfig(0) != "" && excludedSourcesInConfig.contains("screen")) excludedSourcesInConfig else List()
-  val excludedVideoSourcesRow = if (excludedSourcesInConfig(0) != "") "screen" :: excludedSourcesInConfig else List("screen")
+  val onlyYoungGuys = futureGuys.map(guys => guys.filter(g => g.age < 40))
 
-  println(excludedVideoSourcesMain)
-  println(excludedVideoSourcesRow)
+  onlyYoungGuys.onComplete {
+    case Success(guys) => println(guys)
+    case Failure(ex) => println("failed to get guys")
+  }
 
-
-  val width = "1024".toDouble
-  val height = "576".toDouble
-  val prop: Double = height / width
-  println(prop)
-  println(576/1024)
-  val numcol = 5
-  val rowh = ((height / width) * (width / numcol)).toInt
-  println(rowh)
-  val screenHeight = (height - rowh).toInt
-  println(screenHeight)
-  val screenWidth = ((screenHeight / height) * width).toInt
-  println(screenWidth)
-
-  val videoLayout: String =
-    f"""
-      |{
-      |    "main": {
-      |       "xpos: ${((width - screenWidth)/2).toInt}
-      |       "row": 1,
-      |       "column": 2,
-      |       "y_pos": ${screenHeight}
-      |       "width": ${width.toInt}
-      |    }
-      |}
-    """.stripMargin
-
-  val videoLayoutConc1: String =
-    f"""
-       |{
-       |    "main": {
-       |       "row": 1,
-     """
-
-  val videoSources: String = if (excludedVideoSourcesMain.length > 0)
-    f"""|       "video": screen,
-     """
-  else ""
-
-  val videoLayoutConc2: String =
-    f"""|       "column": 2,
-       |    }
-       |}
-    """
-
-  val combined = if (true) videoLayoutConc1 + videoSources + videoLayoutConc2 else videoLayoutConc1  + videoLayoutConc2
-
-  println(videoLayout)
-  println(combined.stripMargin)
 
   def calculateMeaningOfLife: Int = {
     Thread.sleep(2000)

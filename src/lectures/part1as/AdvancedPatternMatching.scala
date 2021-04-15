@@ -84,6 +84,8 @@ object AdvancedPatternMatching extends App {
     case List(1, _*) => "starting with 1"
   }
 
+  println(vararg)
+
   abstract class MyList[+A] {
     def head: A = ???
     def tail: MyList[A] = ???

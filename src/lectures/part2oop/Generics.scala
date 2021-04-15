@@ -2,6 +2,22 @@ package lectures.part2oop
 
 object Generics extends App {
 
+  trait RandomSelector[A] {
+
+    def randomElement[A](seq: Seq[A]): A = {
+      val randomNum = util.Random.nextInt(seq.length)
+      seq(randomNum)
+    }
+  }
+
+  class MyRandomSelector extends RandomSelector[String] {
+
+
+  }
+
+  val mrs = new MyRandomSelector
+  println(s"random selelcted : ${mrs.randomElement(List("1","2","3","4"))}")
+
   class MyList[+A] {
     // use the type A
 

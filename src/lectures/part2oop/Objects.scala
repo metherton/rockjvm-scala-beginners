@@ -2,18 +2,40 @@ package lectures.part2oop
 
 object Objects extends App {
 
-  // SCALA DOES NOT HAVE CLASS LEVEL FUNCTIONALITY
+  // objects do not receive paramterts
 
+
+  // SCALA DOES NOT HAVE CLASS LEVEL FUNCTIONALITY
   object Person { // type + its only instance
     // "static" / "class" - level functionality
     val N_EYES = 2
+
+    // can have method definitions
     def canFly: Boolean = false
 
-    // factory method
-    def apply(mother: Person, father: Person): Person = new Person("Bobbie")
+    // factory methods
+    def from(mother: Person, father: Person): Person = new Person("Bobbie2", 1)
+
+    // pattern widely used in practise
+
+    def apply(mother: Person, father: Person): Person = new Person("Bobbie", 26)
   }
-  class Person(val name: String) {
+
+  // scala object is a singleton instance
+
+  // use val to create class fields..without val it is just a class parameter
+  class Person(val name: String, val age: Int) {
     // instance level functionality
+
+    // body
+
+    val x = 2 // x becomes a field
+
+    println(1 + 3)
+
+    // method
+    def greet(name: String): Unit = println(s"${this.name} says hi $name")
+
   }
   // COMPANIONS
 
@@ -22,13 +44,14 @@ object Objects extends App {
   println(Person.canFly)
 
   // Scala object = SINGLETON INSTANCE
-  val mary = new Person("Mary")
-  val john = new Person("John")
+  val mary = new Person("Mary", 30)
+  val john = new Person("John", 45)
   println(john == mary)
 
   val person1 = Person
   val person2 = Person
 
+  // THESE 2 point to same single instance of Person object
   println(person1 == person2)
 
   val bobbie = Person(mary, john)
@@ -36,6 +59,14 @@ object Objects extends App {
   // Scala applications = Scala objects with
   // def main(args: Array[String]): Unit
 
+  println(s"Bobbie: $bobbie")
 
+  val first = List(1,2,3)
+  val second = List(4,5,6)
+
+  println(first.concat(second))
+
+  println(mary.x)
+  mary.greet("Daniel")
 
 }

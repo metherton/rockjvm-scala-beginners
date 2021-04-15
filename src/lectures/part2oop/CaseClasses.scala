@@ -9,6 +9,9 @@ object CaseClasses extends App {
 
   case class Person(name: String, age: Int)
 
+  case class PairPersons(first: Person, second: Person)
+
+
   // 1. class parameters are fields
   val jim = new Person("Jim", 34)
   println(jim.name)
@@ -28,6 +31,14 @@ object CaseClasses extends App {
   // 5. CCs have companion objects
   val thePerson = Person
   val mary = Person("Mary", 23)
+
+  val firstPair = PairPersons(jim2, mary)
+
+  val firstPersonModified = firstPair.first.copy(name = "newone")
+
+  val newPair = firstPair.copy(first = firstPair.first.copy(name = "newone"))
+
+  println(s"new pair is: $newPair")
 
   // 6. CCs are serializable
   // Akka
