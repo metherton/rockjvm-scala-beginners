@@ -15,6 +15,7 @@ object AnonymousFunctions extends App {
   // no params
   val justDoSomething: () => Int = () => 3
 
+  val anInvocation = justDoSomething()
   // careful
   println(justDoSomething) // function itself
   println(justDoSomething()) // call
@@ -26,9 +27,20 @@ object AnonymousFunctions extends App {
 
   println(stringToInt("55"))
 
+
+  // type inference
+  val doubler_v3: Int => Int = x => x * 2
+
+  val adder1: (Int, Int) => Int = (x, y) => x + y
+
+  // shortest lamdas
+  val doubler_v4: Int => Int = _ * 2
+
   // MORE syntactic sugar
   val niceIncrementer: Int => Int = _ + 1 // equivalent to x => x + 1
   val niceAdder: (Int, Int) => Int = _ + _ // equivalent to (a, b) => a + b
+
+  // each underscore is a different argument, you can't reuse them
 
   /*
       1. MyList: replace all FunctionX calls with lambdas

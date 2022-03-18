@@ -47,13 +47,20 @@ object WhatsAFunction {
    */
 
 
-  val conc = new Function2[String, String, String] {
-    override def apply(v1: String, v2: String): String = v1 + v2
+  // 1
+  val concatenator: (String, String) => String = new Function2[String, String, String] {
+    override def apply(a: String, b: String): String = a + b
   }
 
 
-  println(conc("Martin ", "Etherton"))
+  println(concatenator("Martin ", "Etherton"))
 
+
+  //2
+  // yes : Predicate[T] equivalent with Function1[T, Boolean] === T => Boolean
+  // yes : Transformer[A, B] equivalent with Function1[A, B] === A => B
+
+  //3
 
   val curryF = new Function1[Int, (Int => Int)] {
     override def apply(v1: Int): Int => Int = {

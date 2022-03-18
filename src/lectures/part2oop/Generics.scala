@@ -18,23 +18,41 @@ object Generics extends App {
   val mrs = new MyRandomSelector
   println(s"random selelcted : ${mrs.randomElement(List("1","2","3","4"))}")
 
-  class MyList[+A] {
-    // use the type A
-
-    def add[B >: A](element: B): MyList[B] = ???
-    /*
-        A = Cat
-        B = Dog = Animal
-
-     */
-
-
+  abstract class MyList[A] { // "generic" list
+    def head: A
+    def tail: MyList[A]
   }
 
-  class MyMap[Key, Value]
+  class Empty[A] extends MyList[A] {
+    override def head: A = throw new NoSuchElementException
 
-  val listOfIntegers = new MyList[Int]
-  val listOfStrings = new MyList[String]
+    override def tail: MyList[A] = throw new NoSuchElementException
+  }
+
+  class NonEmpty[A](override val head: A, override val tail: MyList[A]) extends MyList[A]
+
+  val listOfIntegers = new NonEmpty[Int](1, new NonEmpty[Int](2, new Empty[Int]))
+
+  val firstNumber = listOfIntegers.head
+  val adding = firstNumber + 3
+
+//  class MyList[+A] {
+//    // use the type A
+//
+//    def add[B >: A](element: B): MyList[B] = ???
+//    /*
+//        A = Cat
+//        B = Dog = Animal
+//
+//     */
+//
+//
+//  }
+
+  trait MyMap[Key, Value]
+///  class MyMap[Key, Value]
+
+    /
 
   // generic methods
   object MyList {

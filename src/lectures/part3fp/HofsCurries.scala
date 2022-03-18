@@ -2,7 +2,15 @@ package lectures.part3fp
 
 object HofsCurries extends App {
 
-  val superFunction: (Int, (String, (Int => Boolean)) => (Int => Int)) = null
+  val aHof: (Int, (Int => Int)) => Int = (x, func) => x + 1
+  val anotherHof: Int => (Int => Int) = x => (y => y + 2 * x)
+
+
+
+  val superFunction: (Int, (String, (Int => Boolean)) => Int ) => (Int => Int) = (x, func) => (y => x + y)
+
+  // examples: map, filter, flatMap
+
   // higher order functionn HOF
 
   // map, flatMap, filter in MyList
