@@ -18,6 +18,11 @@ object StringOps extends App {
   println(str.reverse)
   println(str.take(2))
 
+  val firstKey = "recording-voice-compliance-nl"
+  //firstKey.split("-").toList.tail.mkString(".")
+  val secondKey = firstKey.split("-").toList.tail.mkString(".")
+  println(s"second key is $secondKey")
+
   // Scala specific: String interpolators
 
   // S - interpolators

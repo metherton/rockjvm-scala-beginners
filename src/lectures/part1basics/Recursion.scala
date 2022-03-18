@@ -68,4 +68,16 @@ object Recursion extends App {
 
 
   println(fibannaci(8))
+
+  val accountIdMapping = Map()
+
+  case class Connection(accountId: Long)
+
+  val conn1 = Connection(1)
+  val conn2 = Connection(2)
+
+  val listConns = List(conn1, conn2)
+
+
+
 }

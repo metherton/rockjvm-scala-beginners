@@ -45,6 +45,12 @@ object Objects extends App {
 
   // Scala object = SINGLETON INSTANCE
   val mary = new Person("Mary", 30)
+  //val mary = null
+  mary match {
+    case p: Person => println(p)
+    case _ => println("no match found")
+  }
+
   val john = new Person("John", 45)
   println(john == mary)
 

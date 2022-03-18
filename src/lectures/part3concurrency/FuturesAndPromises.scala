@@ -20,11 +20,27 @@ object FuturesAndPromises extends App {
   }
 
   val onlyYoungGuys = futureGuys.map(guys => guys.filter(g => g.age < 40))
+  val onlyYoungGuysComplete = futureGuys.map(guys => guys.filter(g => g.age < 40))
 
-  onlyYoungGuys.onComplete {
+
+  val result = onlyYoungGuys andThen {
+      case Success(guys) => println(guys)
+      case Failure(ex) => println("failed to get guys")
+    }
+
+  val resultq = onlyYoungGuysComplete onComplete  {
     case Success(guys) => println(guys)
     case Failure(ex) => println("failed to get guys")
   }
+
+  Thread.sleep(300)
+  println(s"result$result")
+  println(s"resultq$resultq")
+
+//  onlyYoungGuys.onComplete {
+//    case Success(guys) => println(guys)
+//    case Failure(ex) => println("failed to get guys")
+//  }
 
 
   def calculateMeaningOfLife: Int = {
@@ -260,6 +276,91 @@ object FuturesAndPromises extends App {
   retryUntil(action, (x: Int) => x < 5).foreach(result => println("result is " + result))
 
   Thread.sleep(2000)
+
+
+  implicit class ScheduleMapper(schedules: Schedules) {
+    def mapper(): Map[String, Int] = {
+      schedules.listSchedules.map(sched => (sched.name -> sched.age)).toMap
+    }
+  }
+
+  case class Schedule(recType: String, name: String, age: Int)
+  case class Schedules(listSchedules: List[Schedule])
+
+  val s1 = Schedule("1", "compliance", 5)
+  val s2 = Schedule("2", "selective", 3)
+  val scheds = Schedules(List(s1, s2))
+
+  def getSchedules(): Future[Schedules] = Future {
+    Thread.sleep(200)
+    scheds
+  }
+
+  val myRules: Future[Map[String, Int]] = for {
+    myScheds <- getSchedules()
+  } yield myScheds.mapper()
+
+
+  val list = List(List(1),List(2),List(3))
+  val newList = list.flatMap(x => List(x))
+
+  //println(myRules)
+
+  def getRules(): Future[Map[String, Int]] = myRules
+
+  def getExpirationTime(): Future[Int] = {
+    myRules.map(rule => rule("compliance"))
+  }
+
+  val exp = getExpirationTime()
+  exp onComplete {
+    case Success(l) => println(s"value: $l")
+    case Failure(e) => println(e)
+  }
+
+  Thread.sleep(300)
+
+  val doub = (x: Int) => x * 2
+
+  val myInt: List[Int] = List(5)
+  val myIntMapped = myInt.map(x => doub(x))
+  val myIntFlMp = myInt.flatMap( x => List (doub(x)))
+
+  println(myInt)
+
+  val myIntFutureMapped = myInt.map(s => Future { (s * 2).toString } )
+
+//  println(myIntFlatmapped)
+
+
+
+
+//  myIntFlatmapped.andThen {
+//    case Success(bl) => println(bl)
+//    case Failure(e) => print(e)
+//  }
+
+  val times2AndToString = (x: Int) => (x * 2).toString
+
+  val flatMapFn = (x: Int) => Future {times2AndToString(x)}
+
+//  val r = myInt.flatMap(x => flatMapFn(x))
+
+//  println(r)
+
+
+  val bla = Future {
+    3
+  }
+
+  val r = bla onComplete {
+    case Success(s) => s
+    case Failure(e) => println(e)
+  }
+  Thread.sleep(500)
+  println(r)
+
+
 }
 
 

@@ -22,8 +22,8 @@ object Intro extends App {
   val threadHello = new Thread(() => (1 to 5).foreach(_ => println("hello")))
   val threadGoodbye = new Thread(() => (1 to 5).foreach(_ => println("goodbye")))
 //
-//  threadHello.start()
-//  threadGoodbye.start()
+  threadHello.start()
+  threadGoodbye.start()
 
   // executors
   val pool = Executors.newFixedThreadPool(10)

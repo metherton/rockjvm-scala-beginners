@@ -55,7 +55,7 @@ object Exceptions extends App {
      */
 
     // Outofmemory exception
-//    val longArray: Array[Long] = new Array(Int.MaxValue)
+//    val longArray: Array[Long] = new Array(Int.MaxValue)$s
 
     // stackoverflowexception
 //    def fib(count: Int): Int =

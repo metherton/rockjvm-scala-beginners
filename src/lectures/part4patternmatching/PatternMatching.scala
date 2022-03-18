@@ -22,6 +22,7 @@ object PatternMatching extends App {
   // 1. Decompose values
   case class Person(name: String, age: Int)
 
+
   val bob = Person("Bob", 20)
   val greeting = bob match {
     case Person(n, a) if a < 21 => s"Hi, my name is $n and can't drink in the U.S.A"

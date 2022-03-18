@@ -2,6 +2,8 @@ package lectures.part3fp
 
 import scala.annotation.tailrec
 
+
+
 object TuplesAndMaps extends App {
 
 
@@ -28,6 +30,8 @@ object TuplesAndMaps extends App {
 
   // a -> b is sugar for (a, b)
   println(phoneBook)
+
+
 
 
   // map ops
@@ -175,4 +179,55 @@ object TuplesAndMaps extends App {
   }
 
   println(socialConnection(testNet, "Mary", "Jim"))
+
+  case class Person(name: String, age: Int)
+
+  case class GroupPersons(persons: Seq[Person])
+
+  object Team {
+    var players = scala.collection.mutable.Map[String, Int]().empty
+  }
+
+  def addPerson(people: Map[String, Int], p: Person): Map[String, Int] =
+    people + (p.name -> p.age)
+
+
+
+  val messi = Person("lionel", 35)
+  val ronaldo = Person("cristano", 37)
+  val muller = Person("Jan", 30)
+  val spelers = GroupPersons(List(messi, ronaldo))
+
+  val emptyPlayers: Map[String, Int] = Map()
+
+  val players: Map[String, Int] = addPerson(addPerson(addPerson(emptyPlayers, messi), ronaldo), muller)
+
+  def init(): Unit = {
+    spelers.persons.foreach(player => Team.players(player.name) = player.age)
+  }
+  init()
+
+  println(players)
+
+  val age = players.contains("cristano") match {
+    case true => (players.filter(p => p._1.equals("cristano"))).head._2
+    case false => 42
+  }
+
+
+  println(s"age: $age")
+
+  val theRonaldo = Person("cristano", 56)
+  val newSpelers = GroupPersons(List(theRonaldo))
+
+  def merge(newones: GroupPersons): Unit = {
+    newones.persons.foreach(newone => {
+//      if (Team.players.contains(newone.name)) {
+        Team.players(newone.name) = newone.age
+//      }
+    })
+  }
+
+  merge(newSpelers)
+
 }

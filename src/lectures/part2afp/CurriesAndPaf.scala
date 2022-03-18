@@ -6,6 +6,13 @@ object CurriesAndPaf extends App {
   val superAdder: Int => Int => Int =
     x => y => x + y
 
+  val superAdder2:(Int) => Int => Int =
+    x => y => x + y
+
+  val add3_2 = superAdder2(3) // Int  => Int = y => 3 + y
+
+  println(add3_2(40000))
+
   val add3 = superAdder(3) // Int  => Int = y => 3 + y
 
   println(add3(4))
@@ -13,6 +20,12 @@ object CurriesAndPaf extends App {
 
   // METHOD !
   def curriedAdder(x: Int)(y: Int): Int = x + y
+
+  def martCurry(x: Int)(s: String): String = x.toString + s
+
+  val newFirst = martCurry(7) _
+  val newSecond = newFirst("bla")
+  println(newSecond)
 
   println(curriedAdder(4)(5))
 
@@ -66,6 +79,11 @@ object CurriesAndPaf extends App {
 
   // underscores are powerful
   def concatenator(a: String, b: String, c: String) = a + b + c // x: String => concatenator(hello, x, how are you)
+
+  val addTwo = (a: Int, b: Int) => a + b
+  val a2T = addTwo.tupled
+
+  println(a2T((4,5)))
 
   val insertName = concatenator("Hello, I'm ", _: String, ", how are you ?")
 
