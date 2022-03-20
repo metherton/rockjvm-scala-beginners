@@ -49,17 +49,31 @@ object Generics extends App {
 //
 //  }
 
+  // multiple generic types
   trait MyMap[Key, Value]
 ///  class MyMap[Key, Value]
 
-    /
+
 
   // generic methods
   object MyList {
+    def from2Elements[A](elem1: A, elem2: A): MyList[A] =
+      new NonEmpty[A](elem1, new NonEmpty[A](elem2, new Empty[A]))
+
     def empty[A]: MyList[A] = ???
   }
 
+  val first2Numbers = MyList.from2Elements[Int](1, 2)
+
+  val first2Numbers_v2 = MyList.from2Elements(1, 2)
+
+  val first2Numbers_v3 = new NonEmpty(1, new NonEmpty(2, new Empty))
+
   val emptyListOfIntegers = MyList.empty[Int]
+
+  /**
+    * Exercise = generisice linked list implementation
+    */
 
   // variance problem
   class Animal
