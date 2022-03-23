@@ -48,5 +48,13 @@ object AnonymousClasses extends App {
    */
 
 
+  trait MyPredicate[-T] {
+    def test[T](f: T => Boolean): Boolean
+  }
+
+  trait MyTransformer[-A, B] {
+    def transform[A, B](el: A): B
+  }
+
 
 }

@@ -10,6 +10,10 @@ abstract class LList[A] {
   def isEmpty: Boolean
   override def toString() = super.toString
   def add(element: A): LList[A] = new Cons(element, this)
+  //def map[A, B](transformer: Transformer[A, B]): LList[B]
+  //def filter[A](predicate: Predicate[A]): LList[A]
+  //def flatmap
+
 }
 
 class Empty[A] extends LList[A] {

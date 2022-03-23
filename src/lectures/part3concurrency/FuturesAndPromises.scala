@@ -67,7 +67,7 @@ object FuturesAndPromises extends App {
   // mini social network
 
   case class Profile(id: String, name: String) {
-    def poke(anotherProfile: Profile) =
+    def sendMessage(anotherProfile: Profile, message: String) =
       println(s"${this.name} poking ${anotherProfile.name}")
   }
 
@@ -76,10 +76,10 @@ object FuturesAndPromises extends App {
     val names = Map(
       "fb.id.1-zuck" -> "Mark",
       "fb.id.2-bill" -> "Bill",
-      "fb.id.0-dummy" -> "Dummy"
+      "fb.id.0-jane" -> "Jane"
     )
     val friends = Map(
-      "fb.id.1-zuck" -> "fb.id.2-bill"
+      "fb.id.0-jane" -> "fb.id.2-bill"
     )
 
     val random = new Random()
@@ -94,6 +94,41 @@ object FuturesAndPromises extends App {
       Thread.sleep(random.nextInt(400))
       val bfId = friends(profile.id)
       Profile(bfId, names(bfId))
+    }
+
+    def sendMessageToBestFriend(accountId: String, message: String): Unit = {
+      // 1 call fetchProfile
+      val profileFuture = SocialNetwork.fetchProfile(accountId)
+      profileFuture.onComplete {
+        case Success(profile) =>
+          val friendProfileFuture = SocialNetwork.fetchBestFriend(profile)
+          friendProfileFuture.onComplete {
+            case Success(friendProfile) => profile.sendMessage(friendProfile, message)
+            case Failure(e) => e.printStackTrace()
+          }
+        case Failure(exception) => print(exception.printStackTrace)
+      }
+      // 2 call fetchBestFriend
+      // 3 call profile.sendMessage(bestFriend)
+    }
+
+
+    // onComplete is a hassle
+    // solution is functional composition
+
+    val janeProfileFuture = SocialNetwork.fetchProfile("fb.id.0-jane")
+    val janeFuture: Future[String] = janeProfileFuture.map(profile => profile.name) // map transforms value contained inside, asynchronously
+    val janesBestFriend: Future[Profile] = janeProfileFuture.flatMap(profile => SocialNetwork.fetchBestFriend(profile))
+    val janesBestFriendFilter: Future[Profile] = janesBestFriend.filter(profile => profile.name.startsWith("Z"))
+
+    def sendMessageToBestFriend_v2(accountId: String, message: String): Unit = {
+      val profileFuture = SocialNetwork.fetchProfile(accountId)
+      // TODO:
+      val action: Future[Unit] = profileFuture.flatMap { profile =>
+        SocialNetwork.fetchBestFriend(profile).map { bestFriend => // Future[Unit]
+          profile.sendMessage(bestFriend, message) // unit
+        }
+      }
     }
 
   }
@@ -123,7 +158,7 @@ object FuturesAndPromises extends App {
   for {
     mark <- SocialNetwork.fetchProfile("fb.id.1-zuck")
     bill <- SocialNetwork.fetchBestFriend(mark)
-  } mark.poke(bill)
+  } mark.sendMessage(bill, "hey bill")
 
   Thread.sleep(1000)
 
@@ -360,7 +395,53 @@ object FuturesAndPromises extends App {
   Thread.sleep(500)
   println(r)
 
+  def fallbackF = {
+    Future { 56 }
+  }
 
+  val failingFuture = Future {
+    42 / 1
+  }
+
+
+  val failed = failingFuture recoverWith {
+    case e => {
+      println(e)
+      fallbackF
+    }
+
+  }
+
+  val bal = for {
+    res <- failed
+  } yield res
+
+
+  for {
+    b <- bal
+  } yield {
+    println("hi" + b)
+  }
+
+  val n42 = Future {
+    Thread.sleep(500)
+    42
+  }
+
+  val n42DoubleString = n42 map {
+    num => (num * 2).toString
+  }
+
+  n42DoubleString foreach {v => println(v)}
+
+  Thread.sleep(1000)
+
+  val bla5 = Future { 42 / 0}
+  bla5.map {
+    v => v * 2
+  } recoverWith {
+    case e => Future {3}
+  }
 }
 
 
