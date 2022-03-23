@@ -68,7 +68,7 @@ object FuturesAndPromises extends App {
 
   case class Profile(id: String, name: String) {
     def sendMessage(anotherProfile: Profile, message: String) =
-      println(s"${this.name} poking ${anotherProfile.name}")
+      println(s"${this.name} poking ${anotherProfile.name}: $message")
   }
 
   object SocialNetwork {
@@ -76,7 +76,8 @@ object FuturesAndPromises extends App {
     val names = Map(
       "fb.id.1-zuck" -> "Mark",
       "fb.id.2-bill" -> "Bill",
-      "fb.id.0-jane" -> "Jane"
+      "fb.id.0-jane" -> "Jane",
+      "rtjvm.id.0-dummy" -> "Dummy"
     )
     val friends = Map(
       "fb.id.0-jane" -> "fb.id.2-bill"
@@ -131,7 +132,30 @@ object FuturesAndPromises extends App {
       }
     }
 
+
   }
+
+  def sendMessageToBestFriend_v3(accountId: String, message: String): Unit =
+    for {
+      profile <- SocialNetwork.fetchProfile(accountId)
+      bestFriend <- SocialNetwork.fetchBestFriend(profile)
+    } yield profile.sendMessage(bestFriend, message) // identical to version 2
+
+
+  sendMessageToBestFriend_v3("fb.id.0-jane" , "hello bill from jane")
+  Thread.sleep(2000)
+
+  // fallbacks
+  val profileNoMatterWhat = SocialNetwork.fetchProfile("unknown id").recover {
+    case e: Throwable => Profile("rtjvm.id.0-dummy", "Forever alone")
+  }
+
+  val aFetchedProfileNoMatterWhat2: Future[Profile] = SocialNetwork.fetchProfile("unknown id").recoverWith {
+    case e: Throwable => SocialNetwork.fetchProfile("rtjvm.id.0-dummy")
+  }
+
+  val fallbackProfile: Future[Profile] = SocialNetwork.fetchProfile("unknown id").fallbackTo(SocialNetwork.fetchProfile("rtjvm.id.0-dummy"))
+
 
   // client; mark to poke bill
   val mark = SocialNetwork.fetchProfile("fb.id.1-zuck")
