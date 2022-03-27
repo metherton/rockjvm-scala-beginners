@@ -5,16 +5,16 @@ object GettingStarted extends App {
 
   def fib(n: Int): Int = {
     @annotation.tailrec
-    def go(i: Int, prev: Int): Int =
-      if (i == 0) 0
-      else if (i == 1) 1
-      else if (i == n ) prev
-      else go(i + 1, prev + i)
+    def go(n: Int, prev: Int, curr: Int): Int =
+      if (n == 0) prev
+      else go(n - 1, curr, prev + curr)
 
-    go(0, 0)
+    go(n, 0, 1)
   }
 
-  println(fib(0))
+  println(fib(5))
+
+
 
 
 }
