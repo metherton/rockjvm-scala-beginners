@@ -2,6 +2,29 @@ package lectures.part2afp
 
 object Monads extends App {
 
+  def listStory(): Unit = {
+    val aList = List(1, 2, 3)
+    val listMultiply = for {
+      x <- List(1,2,3)
+      y <- List(4,5,6)
+    } yield x * y
+    // for comprehensions - chains of map and flatMap
+    val listMultiply_v2 = List(1,2,3).flatMap(x => List(4,5,6).map( y => x * y))
+    val f = (x: Int) => List(x, x + 1)
+    val g = (x: Int) => List(x, 2 * x)
+    val pure = (x: Int) => List(x)
+
+    println(List(1,2,3).flatMap(f))
+
+    // prop 1 left identity
+    val leftIdentity = pure(42).flatMap(f) == f(42)
+
+    // prop 2 right identity
+
+  }
+
+  listStory()
+
   trait Attempt[+A] {
     def flatMap[B](f: A => Attempt[B]): Attempt[B]
   }

@@ -466,6 +466,46 @@ object FuturesAndPromises extends App {
   } recoverWith {
     case e => Future {3}
   }
+
+  def add(two: Int, three: Int) = Future {
+    two + three
+  }
+
+  def getFirst(): Future[Int] = Future {
+    50
+  }
+
+  def timesTwo(i: Int): Int = i * 2
+
+  def add3Nums(one: Int, two: Int, three: Int) = one + two + three
+
+  def a(two: Int, three: Int) =  {
+    getFirst() map {
+      first => add3Nums(first, two, three)
+    }
+  }
+
+
+  def b(two: Int, three: Int) =  {
+    getFirst() map {
+      first => timesTwo(add3Nums(first, two, three))
+    }
+  }
+
+  a(1, 2).map {
+    res => println(res)
+  }
+
+  b(1, 2).map {
+    res => println(res)
+  }
+
+  val startOne = Future {
+    5
+  }
+
+
+
 }
 
 

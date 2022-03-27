@@ -17,6 +17,13 @@ object InheritanceAndTraitsm extends App {
     }
   }
 
+  trait Something extends Cat {
+    def doLog(): Unit = {
+      println("hey from do log")
+    }
+  }
+
+
   val cat = new Cat
 //  cat.crunch
 

@@ -8,8 +8,24 @@ object PartialFunctions extends App {
     if (x == 1) 42
     else if (x == 2) 56
     else if (x == 5) 999
-    else throw new FunctionNotApplicableException
+    else throw new RuntimeException("no suitable cases")
 
+
+  val aFussyFunction_v2 = (x: Int) => x match {
+    case 1 => 42
+    case 2 => 56
+    case 5 => 999
+  }
+
+
+  // partial function
+  val aPartialFunction_v2: PartialFunction[Int, Int] = { // x match {...}
+      case 1 => 42
+      case 2 => 56
+      case 5 => 999
+  }
+
+  println(aPartialFunction_v2(1))
 
   class FunctionNotApplicableException extends RuntimeException
 
@@ -32,13 +48,20 @@ object PartialFunctions extends App {
   println(aPartialFunction.isDefinedAt(67))
 
   // lift
-  val lifted = aPartialFunction.lift // Int => Option[Int]
-  println(lifted(2))
-  println(lifted(96))
+  val liftedPf = aPartialFunction.lift // Int => Option[Int]
+  println(liftedPf(2))
+  println(liftedPf(96))
+
+
+  val anotherPf: PartialFunction[Int, Int] = {
+    case 45 => 86
+  }
 
   val pfChain = aPartialFunction.orElse[Int, Int] {
     case 45 => 67
   }
+
+  val pfChain2 = aPartialFunction.orElse[Int, Int](anotherPf)
 
   println(pfChain(2))
   println(pfChain(45))
