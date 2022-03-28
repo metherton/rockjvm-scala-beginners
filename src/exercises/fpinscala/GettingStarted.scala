@@ -14,7 +14,18 @@ object GettingStarted extends App {
 
   println(fib(5))
 
+  def isSorted[A](as: Array[A], gt: (A, A) => Boolean): Boolean = {
+    def loop(index: Int): Boolean = {
+      if (index >= as.length - 1) true
+      else if (gt(as(index), as(index + 1))) false
+      else loop(index + 1)
+    }
+    loop(0)
+  }
 
 
+  val isIntegerGreaterThan = (a: Int, b: Int) => a > b
+
+  println(isSorted(Array(7, 2, 3, 4, 5), isIntegerGreaterThan))
 
 }
