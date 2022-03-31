@@ -19,7 +19,7 @@ object List {
 
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil
-    else Cons(as.head, apply(as.tail: _*))
+    else Cons(as.head, apply(as.tail: _*)) // _* allows us to pass a Seq to a variadic method
 
   def fill[A](n: Int, a: A): List[A] = {
     def go(n: Int, acc: List[A]): List[A] = {
@@ -29,6 +29,11 @@ object List {
     go(n, Nil)
   }
 
+  def tail[A](as: List[A]): List[A] = as match {
+      case Nil => throw new UnsupportedOperationException("tail of empty list")
+      case Cons(_, t) => t
+  }
+
 }
 
 object Runner extends App {
@@ -36,4 +41,15 @@ object Runner extends App {
   import List._
   val listDevil: List[Int] = fill(3, 6)
   println(listDevil)
+
+  val x = List(1, 2, 3, 4, 5) match {
+    case Cons(x, Cons(2, Cons(4, _))) => x
+    case Nil => 42
+    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
+
+  }
+
+  println(x)
+  println(tail(List(1,2,3,4,5)))
+  println(tail(List()))
 }

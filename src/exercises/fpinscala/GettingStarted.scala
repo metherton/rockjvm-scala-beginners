@@ -3,6 +3,8 @@ package exercises.fpinscala
 object GettingStarted extends App {
 
 
+  println(List().tail)
+
   def fib(n: Int): Int = {
     @annotation.tailrec
     def go(n: Int, prev: Int, curr: Int): Int =
