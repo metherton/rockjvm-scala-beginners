@@ -34,6 +34,11 @@ object List {
       case Cons(_, t) => t
   }
 
+  def setHead[A](x: A, xs: List[A]): List[A] = xs match {
+    case Nil => Cons(x, Nil)
+    case Cons(h, t) => Cons(x, t)
+  }
+
 }
 
 object Runner extends App {
@@ -51,5 +56,8 @@ object Runner extends App {
 
   println(x)
   println(tail(List(1,2,3,4,5)))
-  println(tail(List()))
+  //println(tail(List())) throws exception
+
+  println(setHead(9, List()))
+  println(setHead(8, List(1,2)))
 }
