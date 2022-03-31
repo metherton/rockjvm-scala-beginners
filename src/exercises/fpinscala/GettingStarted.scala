@@ -46,8 +46,6 @@ object GettingStarted extends App {
   val timesThree: Int => Int = (a: Int) => a * 3
   val timesFour: Int => Int = (a: Int) => a * 4
 
-  val times6 = timesTwo.andThen(times6)
-
 
   def uncurry[A, B, C](f: A => B => C): (A, B) => C =
     (a: A, b: B) => f(a)(b)
