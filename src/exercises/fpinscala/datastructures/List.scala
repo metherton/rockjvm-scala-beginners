@@ -21,6 +21,7 @@ object List {
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*)) // _* allows us to pass a Seq to a variadic method
 
+
   def fill[A](n: Int, a: A): List[A] = {
     def go(n: Int, acc: List[A]): List[A] = {
       if (n <= 0 ) acc
@@ -29,15 +30,41 @@ object List {
     go(n, Nil)
   }
 
-  def tail[A](as: List[A]): List[A] = as match {
+  def tailWithoutDrop[A](as: List[A]): List[A] = as match {
       case Nil => throw new UnsupportedOperationException("tail of empty list")
       case Cons(_, t) => t
   }
+
+  def tail[A](as: List[A]): List[A] = drop(as, 1)
 
   def setHead[A](x: A, xs: List[A]): List[A] = xs match {
     case Nil => Cons(x, Nil)
     case Cons(h, t) => Cons(x, t)
   }
+
+  def drop[A](l: List[A], n: Int): List[A] = {
+    if (n <= 0) l
+    else l match {
+      case Nil => Nil
+      case Cons(x, t) => drop(t, n - 1)
+    }
+  }
+
+//  def drop[A](l: List[A], n: Int): List[A] = {
+//    def go[A](l: List[A], n: Int): List[A] = {
+//      if (n <= 0) l
+//      else l match {
+//        case Nil => l
+//        case Cons(x, t) => go(t, n - 1)
+//      }
+//    }
+//    go(l, n)
+//  }
+
+
+//  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = {
+//
+//  }
 
 }
 
@@ -55,9 +82,15 @@ object Runner extends App {
   }
 
   println(x)
+  println(tailWithoutDrop(List(1,2,3,4,5)))
   println(tail(List(1,2,3,4,5)))
+  //println(tail(List()))
+  println(tail(List()))
   //println(tail(List())) throws exception
 
   println(setHead(9, List()))
   println(setHead(8, List(1,2)))
+
+  println(drop(List(), 3))
+  println(drop(List(1,2,3, 4), 3))
 }

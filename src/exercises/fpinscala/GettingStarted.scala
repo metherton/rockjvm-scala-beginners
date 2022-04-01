@@ -3,7 +3,9 @@ package exercises.fpinscala
 object GettingStarted extends App {
 
 
-  println(List().tail)
+  println(List(1).tail)
+
+  println(List().drop(4))
 
   def fib(n: Int): Int = {
     @annotation.tailrec
