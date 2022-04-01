@@ -11,9 +11,22 @@ object List {
     case Cons(x, xs) => x + sum(xs)
   }
 
+  def sum2(ints: List[Int]): Int =
+    foldRight(ints, 0)((a, b) => a + b)
+
+
+  def sumFoldLeft(ints: List[Int]): Int =
+    foldLeft(ints, 0)((a, b) => a + b)
+
+  def productFoldLeft(ints: List[Int]): Int =
+    foldLeft(ints, 1)((a, b) => a * b)
+
+  def product2(ints: List[Int]): Int =
+    foldRight(ints, 1)((a, b) => a * b)
+
+
   def product(ds: List[Double]): Double = ds match {
     case Nil => 1.0
-    case Cons(0.0, _) => 0.0
     case Cons(x, xs) => x * product(xs)
   }
 
@@ -62,9 +75,50 @@ object List {
 //  }
 
 
-//  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = {
-//
+
+//  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+//    case Cons(h, t) if f(h) => dropWhile(t, f)
+//    case _ => l
 //  }
+
+  /*
+      If we group arguments into two argument lists we don't need to specify type
+   */
+  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    case Cons(h, t) if f(h) => dropWhile(t)(f)
+    case _ => l
+  }
+
+  def append[A](a1: List[A], a2: List[A]): List[A] =
+    a1 match {
+      case Nil => a2
+      case Cons(h, t) => Cons(h, append(t, a2))
+    }
+
+
+  def init[A](l: List[A]): List[A] = l match {
+    case Nil => throw new UnsupportedOperationException("init of empty list")
+    case Cons(_, Nil) => Nil
+    case Cons(h, t) => Cons(h, init(t))
+  }
+
+  def foldRight[A, B](l: List[A], seed: B)(fn: (A, B) => B): B = l match {
+    case Nil => seed
+    case Cons(x, xs) => fn(x, foldRight(xs, seed)(fn))
+  }
+
+  @annotation.tailrec
+  def foldLeft[A, B](as: List[A], acc: B)(f: (B, A) => B): B = as match {
+    case Nil => acc
+    case Cons(h, t) => foldLeft(t, f(acc, h))(f)
+  }
+
+  def lengthFoldLeft[A](as: List[A]): Int =
+    foldLeft(as, 0)((acc, _) => acc + 1)
+
+  def length[A](as: List[A]): Int =
+    foldRight(as, 0)((_, acc) => acc + 1)
+
 
 }
 
@@ -93,4 +147,18 @@ object Runner extends App {
 
   println(drop(List(), 3))
   println(drop(List(1,2,3, 4), 3))
+
+  println(dropWhile(List(1,2,3, 4))( (a) => a < 3 ))
+
+  println(init(List(1,2,3,4,5)))
+  println(foldRight(List(1,2,3,4,5), 0)((a, b) => a + b))
+  println(sum2(List(1,2,3,4,5)))
+  println(sumFoldLeft(List(1,2,3,4,5)))
+  println(product2(List(1,2,3,4,5)))
+
+  println(foldRight(List(1,2,3), Nil:List[Int])(Cons(_, _)))
+
+  println(length(List(1,2,3)))
+  println(foldLeft(List(1,2,3,4,5), 0)((a, b) => a + b))
+
 }
