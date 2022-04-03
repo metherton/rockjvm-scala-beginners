@@ -95,6 +95,8 @@ object List {
       case Cons(h, t) => Cons(h, append(t, a2))
     }
 
+  def appendViaFoldLeft[A](a1: List[A], a2: List[A]): List[A] =
+    foldLeft(a1, a2)((a2, a) => Cons(a, a2))
 
   def init[A](l: List[A]): List[A] = l match {
     case Nil => throw new UnsupportedOperationException("init of empty list")
@@ -107,11 +109,19 @@ object List {
     case Cons(x, xs) => fn(x, foldRight(xs, seed)(fn))
   }
 
+  def foldRightAsFoldLeft[A, B](l: List[A], acc: B)(fn: (A, B) => B): B = {
+    foldLeft(l, acc)((b, a) => fn(a, b))
+  }
+
   @annotation.tailrec
   def foldLeft[A, B](as: List[A], acc: B)(f: (B, A) => B): B = as match {
     case Nil => acc
     case Cons(h, t) => foldLeft(t, f(acc, h))(f)
   }
+
+  def reverse[A](l: List[A]): List[A] =
+    foldLeft(l, List[A]())((acc, h) => Cons(h, acc))
+
 
   def lengthFoldLeft[A](as: List[A]): Int =
     foldLeft(as, 0)((acc, _) => acc + 1)
@@ -119,6 +129,30 @@ object List {
   def length[A](as: List[A]): Int =
     foldRight(as, 0)((_, acc) => acc + 1)
 
+  def concatenate2[A](lOfl: List[List[A]]): List[A] =
+    foldLeft(lOfl, List[A]())((acc, h) => append(acc, h))
+  def concatenate[A](lOfl: List[List[A]]): List[A] =
+    foldLeft(lOfl, List[A]())(append)
+//  def concat[A](l: List[List[A]]): List[A] =
+//    foldRight(l, Nil: List[A], append)
+
+  def addOne(l: List[Int]): List[Int] =
+    reverse(foldLeft(l, Nil : List[Int])((acc, h) => Cons(h + 1, acc)))
+
+  def convertDoubleToString(l: List[Double]): List[String] =
+    foldLeft(l, Nil : List[String])((acc, h) => Cons(h.toString, acc))
+
+
+//  def map[A,B](as: List[A])(f: A => B): List[B] =
+//    foldLeft(as, Nil : List[B])((acc, h) => Cons(f(h), acc))
+  def map[A,B](as: List[A])(f: A => B): List[B] =
+  foldRightAsFoldLeft(reverse(as), Nil : List[B])((h, acc) => Cons(f(h), acc))
+
+  def filter[A](as: List[A])(f: A => Boolean): List[A] =
+    foldRight(as, Nil: List[A])((a, acc) => if (f(a)) Cons(a, acc) else acc)
+
+  def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] =
+    concatenate(map(as)(f))
 
 }
 
@@ -159,6 +193,16 @@ object Runner extends App {
   println(foldRight(List(1,2,3), Nil:List[Int])(Cons(_, _)))
 
   println(length(List(1,2,3)))
+  println(lengthFoldLeft(List(1,2,3)))
   println(foldLeft(List(1,2,3,4,5), 0)((a, b) => a + b))
 
+  println(appendViaFoldLeft(List(4,5,6), List(1,2,3)))
+
+  println(reverse(List(1,2,3)))
+
+  println(concatenate(List(List(1,2,3), List(4,5,6))))
+  println(addOne(List(1,2,3)))
+  println(map(List(1,2,3))(_ * 2))
+  println(filter(List(1,2,3))((x) => x < 3))
+  println(flatMap(List(1,2,3))(x => List(x,x)))
 }
