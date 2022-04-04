@@ -154,6 +154,9 @@ object List {
   def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] =
     concatenate(map(as)(f))
 
+  def filterViaFlatMap[A](l: List[A])(f: A => Boolean): List[A] =
+    flatMap(l)(a => if (f(a)) List(a) else Nil)
+
 }
 
 object Runner extends App {
@@ -205,4 +208,5 @@ object Runner extends App {
   println(map(List(1,2,3))(_ * 2))
   println(filter(List(1,2,3))((x) => x < 3))
   println(flatMap(List(1,2,3))(x => List(x,x)))
+  println(filterViaFlatMap(List(1,2,3))((x) => x < 3))
 }
