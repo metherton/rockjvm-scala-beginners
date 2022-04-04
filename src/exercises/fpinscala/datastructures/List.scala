@@ -157,6 +157,23 @@ object List {
   def filterViaFlatMap[A](l: List[A])(f: A => Boolean): List[A] =
     flatMap(l)(a => if (f(a)) List(a) else Nil)
 
+//  def zip[A](l1: List[A], l2: List[A]): List[A] = {
+//    foldRight(List((l1, l2)), Nil: List[(A, A)])((xs, acc) => Cons((xs._1 + xs._2), acc ))
+//  }
+
+  def addPairWise(l1: List[Int], l2: List[Int]): List[Int] = (l1, l2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addPairWise(t1, t2))
+  }
+
+  def zipWith[A](l1: List[A], l2: List[A], f: (A, A) => A): List[A] = (l1, l2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(t1, t2, f))
+  }
+
+
 }
 
 object Runner extends App {
@@ -209,4 +226,6 @@ object Runner extends App {
   println(filter(List(1,2,3))((x) => x < 3))
   println(flatMap(List(1,2,3))(x => List(x,x)))
   println(filterViaFlatMap(List(1,2,3))((x) => x < 3))
+
+  println(zipWith(List(1,2,3), List(4, 5, 6), (a: Int, b: Int) => a + b))
 }
