@@ -16,6 +16,8 @@ object GettingStarted extends App {
     go(n, 0, 1)
   }
 
+
+
   println(fib(5))
 
   def isSorted[A](as: Array[A], gt: (A, A) => Boolean): Boolean = {
