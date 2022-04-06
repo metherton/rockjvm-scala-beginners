@@ -73,16 +73,18 @@ object FuturesAndPromisesCopyGood extends App {
     .map(e => {
       sendEvent(e)
     }
-    .map(g => Success(g))
+    .map(g => {
+      Success(g)
+    })
     .recover {
       case t => Failure(t)
     }
     )
 
-  Future.sequence(liftedFuture).onComplete {
+  Future.sequence(liftedFuture).foreach(f => {
     case Success(e) => println("All futures succeeded")
     case Failure(e) => println(s"Something failed $e")
-  }
+  })
 
 }
 
