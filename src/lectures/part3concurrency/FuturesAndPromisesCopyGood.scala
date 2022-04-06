@@ -7,7 +7,7 @@ import scala.util.{Failure, Success}
 // important for futures
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object FuturesAndPromisesCopyBad extends App {
+object FuturesAndPromisesCopyGood extends App {
 
   def createAndSendEvents(events: List[String]): Future[Unit] = {
     if (events.size > 0) {
@@ -30,7 +30,7 @@ object FuturesAndPromisesCopyBad extends App {
       }
     } catch {
       case e: Exception => {
-        println(s"unable to send event $data to GRP")
+        println(s"${e.getMessage}")
         p.failure(e)
       }
     } finally {

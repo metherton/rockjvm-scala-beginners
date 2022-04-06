@@ -31,7 +31,7 @@ object FuturesAndPromisesCopyBad extends App {
       }
     } catch {
       case e: Exception => {
-        println(s"unable to send event $data to GRP")
+        println(s"${e.getMessage}")
         p.failure(e)
       }
     } finally {
