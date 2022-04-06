@@ -1,14 +1,99 @@
 package lectures.part3concurrency
 
+import com.sun.xml.internal.rngom.digested.DOneOrMorePattern
+
 import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Failure, Random, Success, Try}
 import scala.concurrent.duration._
+
 
 // important for futures
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object FuturesAndPromises extends App {
 
+  def createAndSendEvents(events: List[String]): Future[Unit] = {
+    if (events.size > 0) {
+      events.foreach(recType => {
+        sendEvent(recType)
+      })
+    }
+    Future.successful(())
+  }
+
+  def sendEvent(data: String) = {
+    val p = Promise[Unit]()
+    if (data.equals("event1")) {
+      p.failure(throw new IllegalArgumentException(s"failed for $data"))
+    } else {
+      p.success(println(s"Succeeded for $data"))
+    }
+    Future.successful(())
+  }
+
+  def transferRecording() = {
+    val transferData = for {
+      recording <- Future { "recording" }
+      _ <- createAndSendEvents(List("event1", "event2", "event3"))
+    } yield ()
+
+    transferData.andThen {
+      case Success(_) => println("transfer data succeeded")
+      case Failure(_) => println("transfer data failed")
+
+    }
+
+  }
+
+
+  val fInt = Future {
+    42
+    println("jehh")
+  }
+
+  val getVal = for {
+    i <- fInt
+  } yield i
+
+  def retFut(i: Int) =   {
+    val p = Promise[Unit]()
+    if (i == 666) {
+      Thread.sleep(1000)
+      p.failure(new IllegalArgumentException(s"Bad $i"))
+    } else {
+      Thread.sleep(1000)
+      p.success(s"Good $i")
+    }
+    p.future
+  }
+
+  val bla7: List[Future[Unit]] = for {
+    i <- List(1,3)
+  } yield retFut(i)
+
+  val t = bla7.forall(p => true)
+
+  def sendEvents(): Future[Unit] = {
+    val fs = List(1, 666)
+    fs.foreach(i => {
+      retFut(i)
+    })
+    Future.successful()
+  }
+
+  val callFu = for {
+    events <- sendEvents()
+  } yield events
+
+  callFu.andThen {
+    case Success(_) => println("everything went great")
+    case Failure(e) => println("something went wrong")
+  }
+
+//  val callFuGood = for {
+//    i <- List(1, 666)
+//    futs <- retFut(i)
+//  } yield futs
 
   case class Person(name: String, age: Int)
 
@@ -235,6 +320,14 @@ object FuturesAndPromises extends App {
   // promises
   val promise = Promise[Int]() // controller over a future
   val future = promise.future
+
+  def getMyPromise(): Unit = {
+    val promise = Promise[Int]
+    val p = promise.future
+    p
+  }
+
+  println(getMyPromise())
 
   // thread 1 - consumer
   future.onComplete {
