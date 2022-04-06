@@ -81,10 +81,8 @@ object FuturesAndPromisesCopyGood extends App {
     }
     )
 
-  Future.sequence(liftedFuture).foreach(f => {
-    case Success(e) => println("All futures succeeded")
-    case Failure(e) => println(s"Something failed $e")
-  })
+  Future.sequence(liftedFuture).foreach(f => println(f))
+
 
 }
 
