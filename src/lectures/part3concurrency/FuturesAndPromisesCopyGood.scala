@@ -69,8 +69,15 @@ object FuturesAndPromisesCopyGood extends App {
 
 //  val lifted: List[Future[Try[String]]] = List(f1, f2).map(_.map(Success(_)).recover {case t => Failure(t)})
 
-  val liftedFuture: List[Future[Try[Unit]]] = List("event1", "event2", "event3").map(e => sendEvent(e).map(g => Success(g)).recover {
-      case t => Failure(t)})
+  val liftedFuture: List[Future[Try[Unit]]] = List("event1", "event2", "event3")
+    .map(e => {
+      sendEvent(e)
+    }
+    .map(g => Success(g))
+    .recover {
+      case t => Failure(t)
+    }
+    )
 
   Future.sequence(liftedFuture).onComplete {
     case Success(e) => println("All futures succeeded")
