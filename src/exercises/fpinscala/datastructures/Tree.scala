@@ -16,6 +16,16 @@ object Tree {
     case Branch(l, r) => maximum(l) max maximum(r)
   }
 
+  def depth(t: Tree[Int]): Int = t match {
+    case Leaf(_) => 1
+    case Branch(l, r) => 1 + depth(l) max depth(r)
+  }
+
+  def map[A, B](t: Tree[A])(f: A => B): Tree[B] = t match {
+    case Leaf(v) => Leaf(f(v))
+    case Branch(l, r) => Branch(map(l)(f), map(r)(f))
+  }
+
 }
 
 object RunnerTree extends App {
@@ -27,5 +37,7 @@ object RunnerTree extends App {
 
   println(size(b))
   println(maximum(b))
+  println(depth(b))
+  println(map(b)(a => a * 2))
 }
 

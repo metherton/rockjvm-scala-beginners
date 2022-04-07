@@ -256,6 +256,14 @@ object FuturesAndPromises extends App {
 //  }
 
 
+  val fString = Future {
+    "hello world"
+  }
+  val numLetters = fString.flatMap(s => Future {s.size})
+  numLetters.andThen {
+    case Success(s) => println(s)
+  }
+
 
   // functional composition of futures
   // map, flatMap, filter
