@@ -11,6 +11,15 @@ object Tree {
     case Branch(l, r) => 1 + size(l) + size(r)
   }
 
+  def sizeUsingFold[A](t: Tree[A]): Int =  {
+    fold(t, (a: A) => 1, (a: Int, b: Int) => 1 + a + b)
+  }
+
+  def fold[A, B](t: Tree[A], f: A => B, g: (B, B) => B): B = t match {
+    case Leaf(v) => f(v)
+    case Branch(l, r) => g(fold(l, f, g), fold(r, f, g))
+  }
+
   def maximum(t: Tree[Int]): Int = t match {
     case Leaf(v) => v
     case Branch(l, r) => maximum(l) max maximum(r)
@@ -26,6 +35,8 @@ object Tree {
     case Branch(l, r) => Branch(map(l)(f), map(r)(f))
   }
 
+
+
 }
 
 object RunnerTree extends App {
@@ -36,8 +47,10 @@ object RunnerTree extends App {
   val b: Tree[Int] = Branch(Branch(Leaf(1), Leaf(3)), Leaf(2))
 
   println(size(b))
+  println(sizeUsingFold(b))
   println(maximum(b))
   println(depth(b))
   println(map(b)(a => a * 2))
+
 }
 
