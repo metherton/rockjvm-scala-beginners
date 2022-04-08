@@ -15,6 +15,10 @@ object Tree {
     fold(t, (a: A) => 1, (a: Int, b: Int) => 1 + a + b)
   }
 
+  def depthUsingFold[A](t: Tree[A]): Int =  {
+    fold(t, (a: A) => 1, (a: Int, b: Int) => 1 + a.max(b))
+  }
+
   def fold[A, B](t: Tree[A], f: A => B, g: (B, B) => B): B = t match {
     case Leaf(v) => f(v)
     case Branch(l, r) => g(fold(l, f, g), fold(r, f, g))
@@ -50,6 +54,7 @@ object RunnerTree extends App {
   println(sizeUsingFold(b))
   println(maximum(b))
   println(depth(b))
+  println(depthUsingFold(b))
   println(map(b)(a => a * 2))
 
 }
