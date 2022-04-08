@@ -24,6 +24,10 @@ object Tree {
     case Branch(l, r) => g(fold(l, f, g), fold(r, f, g))
   }
 
+  def mapUsingFold[A, B](t: Tree[A])(f: A => B): Tree[B] =  {
+    fold(t, (a: A) => Leaf(f(a)), (a: Tree[B], b: Tree[B]) => Branch(a, b))
+  }
+
   def maximum(t: Tree[Int]): Int = t match {
     case Leaf(v) => v
     case Branch(l, r) => maximum(l) max maximum(r)
@@ -56,6 +60,7 @@ object RunnerTree extends App {
   println(depth(b))
   println(depthUsingFold(b))
   println(map(b)(a => a * 2))
+  println(mapUsingFold(b)(a => a * 2))
 
 }
 
