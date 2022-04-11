@@ -7,7 +7,7 @@ sealed trait Option[+A] {
   def getOrElse[ B >: A](default: => B): B
   def orElse[B >: A](ob: => Option[B]): Option[B]
   def filter(f: A => Boolean): Option[A]
-
+  def variance(xs: Seq[Double]): Option[Double]
 
 }
 
@@ -21,20 +21,30 @@ case class Some[+A](get: A) extends Option[A] {
     case _ => default
   }
 
-  override def orElse[B >: A](ob: => Option[B]): Option[B] = this match {
-    case None => ob
-    case _ => this
-  }
+
+  override def orElse[B >: A](ob: => Option[B]): Option[B] =
+    map(v => Some(v)).getOrElse(ob)
 
   override def filter(f: A => Boolean): Option[A] = this match {
     case Some(a) if (f(a)) => this
     case _ => None
   }
 
+  def filterViaMap(f: A => Boolean): Option[A] =
+    flatMap(a => if (f(a)) Some(a) else None)
+
   override def map[B](f: A => B): Option[B] = this match {
     case Some(x) => Some(f(x))
     case _ => None
   }
+
+  def mean(xs: Seq[Double]): Option[Double] =
+    if (xs.isEmpty) None
+    else Some(xs.sum/xs.size)
+
+
+  override def variance(xs: Seq[Double]): Option[Double] =
+    mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
 }
 case object None extends Option[Nothing] {
   override def flatMap[B](f: Nothing => Option[B]): Option[B] = None
@@ -46,4 +56,10 @@ case object None extends Option[Nothing] {
   override def filter(f: Nothing => Boolean): Option[Nothing] = None
 
   override def map[B](f: Nothing => B): Option[B] = None
+
+  override def variance(xs: Seq[Double]): Option[Double] = None
+}
+
+object OptionRunner extends App {
+
 }
