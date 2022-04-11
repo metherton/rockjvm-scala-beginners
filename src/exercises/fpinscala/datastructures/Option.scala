@@ -1,5 +1,7 @@
 package exercises.fpinscala.datastructures
 
+import exercises.fpinscala.datastructures.OptionRunner.{Try, insuranceRateQuote}
+
 sealed trait Option[+A] {
 
   def map[B](f: A => B): Option[B]
@@ -8,8 +10,11 @@ sealed trait Option[+A] {
   def orElse[B >: A](ob: => Option[B]): Option[B]
   def filter(f: A => Boolean): Option[A]
   def variance(xs: Seq[Double]): Option[Double]
-
+  def lift[A,B](f: A => B): Option[A] => Option[B]
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C]
 }
+
+
 
 case class Some[+A](get: A) extends Option[A] {
   override def flatMap[B](f: A => Option[B]): Option[B] = {
@@ -45,7 +50,29 @@ case class Some[+A](get: A) extends Option[A] {
 
   override def variance(xs: Seq[Double]): Option[Double] =
     mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
+
+  override def lift[A, B](f: A => B): Option[A] => Option[B] = _ map f
+
+//  override def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = (a, b) match {
+//    case (None, _) => None
+//    case (_, None) => None
+//    case (aOpt, bOpt) => Some(f(aOpt, bOpt))
+//  }
+  override def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a.flatMap(aa => b.map(bb => f(aa, bb)))
+
+  def insuranceRateQuote(age: Int, numberOfSpeedingTickets: Int): Double = ???
+
+  def parseInsuranceRateQuote(age: String, numberOfSpeedingTickets: String): Option[Double] = {
+
+    val optAge: Option[Int] = Try { age.toInt }
+    val optTickets: Option[Int] = Try { numberOfSpeedingTickets.toInt }
+    map2(optAge, optTickets)(insuranceRateQuote)
+  }
 }
+
+
+
 case object None extends Option[Nothing] {
   override def flatMap[B](f: Nothing => Option[B]): Option[B] = None
 
@@ -58,8 +85,23 @@ case object None extends Option[Nothing] {
   override def map[B](f: Nothing => B): Option[B] = None
 
   override def variance(xs: Seq[Double]): Option[Double] = None
+
+  override def lift[A, B](f: A => B): Option[A] => Option[B] = None[B]
+
+  override def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = None
 }
 
 object OptionRunner extends App {
+
+
+
+  def Try[A](a: => A): Option[A] =
+    try Some(a)
+    catch {case e: Exception => None}
+
+
+
+
+
 
 }
