@@ -1,6 +1,6 @@
 package exercises.fpinscala.datastructures
 
-import exercises.fpinscala.datastructures.OptionRunner.{Try, insuranceRateQuote}
+import exercises.fpinscala.datastructures.OptionRunner.{Try}
 
 sealed trait Option[+A] {
 
@@ -12,6 +12,8 @@ sealed trait Option[+A] {
   def variance(xs: Seq[Double]): Option[Double]
   def lift[A,B](f: A => B): Option[A] => Option[B]
   def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C]
+  def sequence[A](a: List[Option[A]]): Option[List[A]]
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]]
 }
 
 
@@ -69,6 +71,19 @@ case class Some[+A](get: A) extends Option[A] {
     val optTickets: Option[Int] = Try { numberOfSpeedingTickets.toInt }
     map2(optAge, optTickets)(insuranceRateQuote)
   }
+
+  override def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
+    case Cons(h, t) => h.flatMap( hh => sequence(t).map( x => Cons(hh, x)))
+  }
+
+  def sequenceUsingTraverse[A](a: List[Option[A]]): Option[List[A]] =
+    traverse(a)(x => x)
+
+  override def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = a match {
+    case Nil => Some(Nil)
+    case Cons(h, t) => map2(f(h), traverse(t)(f))((a, b) => Cons(a, b))
+
+  }
 }
 
 
@@ -89,6 +104,10 @@ case object None extends Option[Nothing] {
   override def lift[A, B](f: A => B): Option[A] => Option[B] = None[B]
 
   override def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = None
+
+  override def sequence[A](a: List[Option[A]]): Option[List[A]] = None
+
+  override def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = None
 }
 
 object OptionRunner extends App {
