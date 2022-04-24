@@ -11,6 +11,48 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object FuturesAndPromisesCopyGood extends App {
 
+ // val failedF = Future.failed(new UnsupportedOperationException("I am failed future"))
+  val failedF = Future.successful("successful future")
+
+  val failedFMap = failedF.map(s => println(s" in map $s"))
+  failedFMap recoverWith {
+    case _ => Future.successful(1)
+
+  }
+
+  val intF = Future {
+    println("in printf")
+    1
+  }
+
+  val doF = Future {
+    println("in dof")
+    42
+    //throw new UnsupportedOperationException("dof is not supported")
+  }
+
+  val doF2 = Future {
+    println("in dof2")
+
+  }
+
+
+  val dolResult = doF.andThen {
+    case Success(i) => {
+      println(s"hopefully not doing anything $i")
+      throw new UnsupportedOperationException("dof throwing exception")
+    }
+    case Failure(e) => println(s"should throw exception $e")
+  }
+
+  dolResult.andThen {
+    case Success(i) => {
+      println(s"hopefully not doing anything second andThen")
+    }
+    case Failure(e) => println(s"should come in second andThen failure $e")
+  }
+
+
   def createAndSendEvents(events: List[String], recordingType: String): Future[Unit] = {
     println(s"create and send events $recordingType")
     if (events.size > 0) {
@@ -89,7 +131,7 @@ object FuturesAndPromisesCopyGood extends App {
     }
     )
 
-  Future.sequence(liftedFuture).foreach(f => println(f))
+ // Future.sequence(liftedFuture).foreach(f => println(f))
 
 
   val fRecording = Future {
@@ -97,18 +139,29 @@ object FuturesAndPromisesCopyGood extends App {
   }
   val fFail = Future.failed(new IllegalArgumentException("wrong param"))
   val fAccount = Future {
+    println("in future account")
     "account"
   }
   val fCall = Future {
+    println("in future call")
     "call"
   }
 
   val details = (for {
-    recording <- fRecording
+    fail <- fFail
+    //recording <- fRecording
     account <- fAccount
     call <- fCall
   //  fail <- fFail
-  } yield (recording, account, call))
+ // } yield (recording, account, call))
+  } yield (fail, account, call))
+
+  println(details)
+
+  details.andThen {
+    case Success(e) => println(e)
+    case _ => println("failed")
+  }
 
 //  details.andThen {
 //    case Success(d) => println(d._2)
