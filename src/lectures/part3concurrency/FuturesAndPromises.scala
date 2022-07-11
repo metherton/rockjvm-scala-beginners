@@ -12,6 +12,82 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object FuturesAndPromises extends App {
 
+
+  val f1first = Future { 2 }
+  val f1mapr = f1first.map(n => n + 1)
+  
+
+  println(f1mapr)
+
+  def result1(): Future[Int] = Future.failed(new NoSuchElementException)
+  //def result1(): Future[Int] = Future.successful(666)
+
+  def result2(): Future[Int] = {
+    println("in result2")
+    Future.successful(42)
+  }
+  def result3(): Future[Int] = Future.successful(666)
+
+  val b1 = result1 map { _ =>
+    println("in result1 map")
+    result2()
+  } map { _ =>
+    result3()
+  }
+
+  // recover {
+   // case _ => Future.successful("help")
+ // }
+
+  b1.andThen {
+    case Success(v) => println(s"r2 = $v")
+    case _ => println("r2 faled")
+  }
+
+  val f1 = Future.failed(new UnsupportedOperationException("bla"))
+
+  val endr = f1.flatMap(s => Future.successful(42))
+  endr.onComplete {
+    case Success(e) => println(s"Succeeded with $e")
+    case Failure(e) => println(s"Failed with $e")
+  }
+
+  val f2 = f1.andThen {
+    case Success(value) => Future.failed(new UnsupportedOperationException("unspp1"))
+    case _ => {
+      Thread.sleep(2000)
+      println(s" first faild")
+    }
+  }
+  f2.andThen {
+    case Success(value) => println(s"values is $value")
+    case Failure(e) => println(s"failedvalue is $e")
+  }
+
+  val option42 = Some(42)
+  val futureOption42 = Future {option42}
+
+  val bla5 = for {
+    b1 <- futureOption42
+
+  } yield b1
+
+  def processFailedFuture = {
+    Future.failed(throw new IllegalArgumentException)
+  }
+
+  def failedFuture = Future {
+    1 / 0
+  }
+
+//  failingFuture.flatMap(a => processFailedFuture).recoverWith {
+//    case e => {
+//      println("it failed")
+//      Future.successful(1)
+//    }
+//  }
+
+
   def createAndSendEvents(events: List[String]): Future[Unit] = {
     if (events.size > 0) {
       events.foreach(recType => {
@@ -23,7 +99,7 @@ object FuturesAndPromises extends App {
 
   def sendEvent(data: String) = {
     val p = Promise[Unit]()
-    if (data.equals("event1")) {
+    if (data.equals("event1XX")) {
       p.failure(throw new IllegalArgumentException(s"failed for $data"))
     } else {
       p.success(println(s"Succeeded for $data"))
@@ -32,19 +108,53 @@ object FuturesAndPromises extends App {
   }
 
   def transferRecording() = {
+    println(s"transfer recording current prio is ${Thread.currentThread().getPriority}")
     val transferData = for {
       recording <- Future { "recording" }
       _ <- createAndSendEvents(List("event1", "event2", "event3"))
     } yield ()
 
     transferData.andThen {
-      case Success(_) => println("transfer data succeeded")
+      case Success(_) => {
+        println("transfer data succeeded")
+        doSomething1().andThen {
+          case Success(_) => doSomething2()
+          case Failure(_) => println("doSomething1 failed")
+        }
+      }
       case Failure(_) => println("transfer data failed")
 
+    }.andThen {
+      case Success(_) => {
+        println("dosomething2 succeeded")
+        doSomething3()
+      }
+      case Failure(_) => println("transfer data failed")
     }
 
+    Future.successful(1)
   }
 
+  def doSomething1(): Future[Int] = Future {
+    println("doSomething1")
+    Thread.sleep(2000)
+    1
+  }
+
+  def doSomething3(): Future[Int] = Future {
+    Thread.sleep(500)
+    println("doSomething3")
+    1
+  }
+
+  def doSomething2(): Future[Int] = Future {
+    Thread.sleep(4000)
+    println("doSomething2")
+    1
+  }
+
+  Thread.currentThread().setPriority(Thread.MIN_PRIORITY)
+  transferRecording()
 
   val fInt = Future {
     42
@@ -96,6 +206,54 @@ object FuturesAndPromises extends App {
 //  } yield futs
 
   case class Person(name: String, age: Int)
+
+
+  def newFP = {
+    val newP = Person("jo", 44)
+  }
+
+  def fPerson() = {
+    val newp = Person("martin", 33)
+    val futureOptionPerson = Future.successful(Option(newp))
+    val ret = for {
+      op <- futureOptionPerson
+    } yield op match {
+      case Some(_) => ()
+      case _ => {
+        Future.successful(newFP)
+        ()
+      }
+    }
+    ret
+  }
+
+  def fPerson1() = {
+    val newp = Person("martin", 33)
+    val futureOptionPerson = Future.successful(Option(newp))
+    val ret = for {
+      op <- futureOptionPerson
+    } yield op match {
+      case Some(p) => {
+        p
+        ()
+      }
+      case _ => {
+        val op = newFP
+        ()
+      }
+    }
+    ret
+  }
+
+  fPerson1() andThen {
+    case Success(_) => println("fperson1 succeedd")
+    case _ => println("fperson1 failed")
+  }
+
+  fPerson() andThen {
+    case Success(_) => println("future succeedd")
+    case _ => println("future failed")
+  }
 
   val youngGuy = Person("youngie", 20)
   val oldGuy = Person("oldie", 50)
@@ -561,12 +719,8 @@ object FuturesAndPromises extends App {
 
   Thread.sleep(1000)
 
-  val bla5 = Future { 42 / 0}
-  bla5.map {
-    v => v * 2
-  } recoverWith {
-    case e => Future {3}
-  }
+  val multipleBooleans = (true, true, false)
+
 
   def add(two: Int, three: Int) = Future {
     two + three

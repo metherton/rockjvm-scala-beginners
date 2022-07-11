@@ -36,6 +36,8 @@ object ThreadCommunication extends App {
       println("[consumer] I have consumed " + container.get)
     })
 
+    println(s"thread prio is ${consumer.getPriority}")
+
     val producer = new Thread(() => {
       println("[producer] computing...")
       Thread.sleep(500)
@@ -63,6 +65,8 @@ object ThreadCommunication extends App {
       }
       println("[consumer] I have consumed " + container.get)
     })
+
+    println(s"thread prio is ${consumer.getPriority}")
 
     val producer = new Thread(() => {
       println("[producer] hard at work...")
@@ -282,6 +286,7 @@ object ThreadCommunication extends App {
 
     def pass(other: Friend) = {
       while(this.side == other.side) {
+        println(s"current thread prio is ${Thread.currentThread().getPriority}")
         println(s"$this: Oh, but please, $other, feel free to pass...")
         switchSide()
         Thread.sleep(1000)

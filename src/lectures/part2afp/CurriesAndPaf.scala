@@ -2,6 +2,13 @@ package lectures.part2afp
 
 object CurriesAndPaf extends App {
 
+
+  def printChannel(channel: String) = println(s"Passed in channel is $channel")
+
+  val callPrintChannel = ((channel: String) => printChannel(channel))
+
+  callPrintChannel("voice")
+
   // curried functions
   val superAdder: Int => Int => Int =
     x => y => x + y

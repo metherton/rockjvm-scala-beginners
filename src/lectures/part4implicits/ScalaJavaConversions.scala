@@ -12,6 +12,15 @@ object ScalaJavaConversions extends App {
 
   val scalaSet = javaSet.asScala
 
+  val javalist = new ju.ArrayList[String]()
+  javalist.add("first")
+
+  javalist.asScala.toList match {
+    case Seq(l) => println("is a scala sqe")
+    case _ => println("is not a scala seq")
+  }
+
+
   /*
       Iterator
       Iterable

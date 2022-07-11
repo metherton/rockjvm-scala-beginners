@@ -99,4 +99,12 @@ object AllThePatterns extends App {
   // JVM trick question
 
 
+  val id = "RE123"
+  val recording = "RE.*".r
+
+  id match {
+    case recording() => println(s"recording")
+    case _ => println("not recording")
+  }
+
 }

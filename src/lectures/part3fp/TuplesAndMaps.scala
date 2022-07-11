@@ -7,6 +7,12 @@ import scala.annotation.tailrec
 object TuplesAndMaps extends App {
 
 
+  val myList = List(1,2,3)
+  val newmaplist = myList.map((x) => x * 2)
+  val newflatmaplist = myList.flatMap((x) => List(x * 2))
+  println(newmaplist)
+  println(newflatmaplist)
+
   val myM = scala.collection.mutable.Map(("one" -> ("oneP", "oneS")), ("two" -> ("twoP", "twoS")))
   myM += ("three" -> ("threeP", "threeS"))
   println(myM)

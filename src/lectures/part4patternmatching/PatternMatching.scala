@@ -1,8 +1,21 @@
 package lectures.part4patternmatching
 
+import java.util
+
 import scala.util.Random
 
 object PatternMatching extends App {
+
+  val javaList = new util.ArrayList[String]
+  javaList.add("one")
+  javaList.add("two")
+  javaList.add("three")
+
+  javaList.get(0) match {
+    case "one" => println("one is found")
+    case _ => println("something else found")
+  }
+
 
 
   // switch on steroids

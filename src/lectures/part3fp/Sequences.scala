@@ -4,6 +4,15 @@ import scala.util.Random
 
 object Sequences extends App {
 
+
+  val minBatchSize = 10
+
+  val buffer = scala.collection.mutable.ListBuffer.empty[String]
+  buffer += "first"
+  println(buffer)
+  println(buffer.size)
+  println(buffer(0))
+
   // Sequences
   val aSequence = Seq(1,3,2,4)
   println(aSequence)
